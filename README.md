@@ -32,8 +32,11 @@ npm install && npm run build
 
 ### Power Features
 - **JSON diff** — set a base request, select another to compare with color-coded additions, removals, and changes
+- **JSONPath queries** — `$.data[*].name` with match highlighting and navigation
+- **Request timing waterfall** — mini stacked color bar per request, detailed phase breakdown (blocked, DNS, connect, SSL, send, wait, receive)
+- **Pin/bookmark** — pin important requests to the top of the list, pinned items survive clear
 - **BigInt precision** — integers > 2^53 displayed without JS float precision loss (Snowflake IDs, financial APIs)
-- **Import/Export** — paste from clipboard, import files, export as JSON or HAR 1.2
+- **Import/Export** — paste from clipboard, import files, export as JSON or HAR 1.2 (with real timing data)
 - **NDJSON** — auto-detects JSON Lines format, parses each line separately
 - **Chunked rendering** — handles 10k+ node responses without lag
 
@@ -53,6 +56,8 @@ npm install && npm run build
 | `/` or `Ctrl+F` | Focus search |
 | `Enter` / `Shift+Enter` | Next / previous search match |
 | `n` / `Shift+n` | Next / previous search match (outside input) |
+| `p` | Toggle JSONPath query bar |
+| `b` | Pin/unpin selected request |
 | `Escape` | Clear search, then close detail pane |
 | `?` | Toggle keyboard shortcut help |
 
@@ -61,7 +66,7 @@ npm install && npm run build
 ```bash
 npm run dev        # vite build --watch
 npm run build      # tsc --noEmit && vite build
-npm test           # vitest (80 tests)
+npm test           # vitest (89 tests)
 npm run lint       # biome check
 npm run package    # build + zip for Chrome Web Store
 ```
@@ -76,10 +81,11 @@ panel.html → main.tsx → <App />
   ├── Toolbar         (clear, copy, paste, import, export, diff, theme)
   ├── Sidebar
   │   ├── URL filter  (debounced, case-insensitive)
-  │   └── RequestList → RequestItem (method, url, status, time, size)
+  │   └── RequestList → RequestItem (method, url, status, waterfall bar, size)
   ├── Detail pane
   │   ├── SearchBar   (debounced, next/prev, clear)
-  │   ├── DetailHeader (method, status, timing, headers)
+  │   ├── DetailHeader (method, status, timing breakdown, headers)
+  │   ├── JsonPathBar  (JSONPath query with match navigation)
   │   └── JsonTree → JsonNode (recursive, collapsible, chunked)
   ├── DiffViewer      (side-by-side comparison)
   └── KeyboardHelp    (shortcut overlay)
@@ -100,7 +106,7 @@ panel.html → main.tsx → <App />
 
 - **Runtime:** Preact 10
 - **Build:** Vite 6, TypeScript 5
-- **Test:** Vitest (80 tests)
+- **Test:** Vitest (89 tests)
 - **Lint:** Biome
 - **Platform:** Chrome Extensions Manifest V3
 
