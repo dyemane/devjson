@@ -1,3 +1,4 @@
+import { useCallback, useMemo, useRef, useState } from "preact/hooks";
 import { useRequests } from "./hooks/use-requests";
 import { useJsonSearch } from "./hooks/use-json-search";
 import { useResize } from "./hooks/use-resize";
@@ -7,6 +8,7 @@ import { DetailHeader } from "./components/detail-header";
 import { JsonTree } from "./components/json-tree";
 import { SearchBar } from "./components/search-bar";
 import { EmptyState } from "./components/empty-state";
+import { SEARCH_DEBOUNCE_MS } from "../shared/constants";
 import "./styles/panel.css";
 import "./styles/toolbar.css";
 import "./styles/request-list.css";
@@ -26,6 +28,24 @@ export function App() {
     "vertical",
   );
 
+  const [urlFilter, setUrlFilter] = useState("");
+  const filterTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  const handleFilterInput = useCallback((e: Event) => {
+    const value = (e.target as HTMLInputElement).value;
+    clearTimeout(filterTimer.current);
+    filterTimer.current = setTimeout(() => setUrlFilter(value), SEARCH_DEBOUNCE_MS);
+  }, []);
+
+  const filteredRequests = useMemo(() => {
+    if (!urlFilter.trim()) return requests;
+    const q = urlFilter.trim().toLowerCase();
+    return requests.filter((r) => {
+      const haystack = `${r.method} ${r.url}`.toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [requests, urlFilter]);
+
   const closeDetail = () => setSelectedId(null);
 
   return (
@@ -36,15 +56,27 @@ export function App() {
           <div class="sidebar-header">
             <span class="sidebar-header__title">Requests</span>
             <span class="sidebar-header__count">
-              {requests.length > 0 ? requests.length : ""}
+              {urlFilter
+                ? `${filteredRequests.length}/${requests.length}`
+                : requests.length > 0
+                  ? requests.length
+                  : ""}
             </span>
           </div>
+          <div class="sidebar-filter">
+            <input
+              class="sidebar-filter__input"
+              type="text"
+              placeholder="Filter by URL or method…"
+              onInput={handleFilterInput}
+            />
+          </div>
           <div class="sidebar-body">
-            {requests.length === 0 ? (
+            {filteredRequests.length === 0 ? (
               <EmptyState />
             ) : (
               <RequestList
-                requests={requests}
+                requests={filteredRequests}
                 selectedId={selectedId}
                 onSelect={setSelectedId}
               />
