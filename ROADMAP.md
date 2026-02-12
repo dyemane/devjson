@@ -31,10 +31,9 @@ Prioritized by competitive gaps (what users of JSON Viewer Pro / tulios/json-vie
 - [x] Syntax themes — Dark, Light, Monokai, Solarized (persisted in localStorage)
 - [x] Keyboard navigation — j/k requests, n/N search matches, / to search, ? for help overlay
 
-### Nice to Have
-- [ ] JSONPath query bar (e.g. `$.data[*].name`)
-- [ ] Pin/bookmark specific requests
-- [ ] Request timing waterfall visualization
+- [x] JSONPath query bar (`$.data[*].name` — toggle with `p`, navigate matches with n/N)
+- [x] Pin/bookmark specific requests (toggle with `b`, pinned items stick to top, survive clear)
+- [x] Request timing waterfall visualization (mini stacked bar in sidebar, detailed breakdown in detail header, real HAR timings in export)
 
 ## Non-Goals
 
