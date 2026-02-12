@@ -1,7 +1,7 @@
 import { useMemo, useState } from "preact/hooks";
 import type { SearchMatch } from "../types";
 
-function searchJson(
+export function searchJson(
   value: unknown,
   query: string,
   path = "",
