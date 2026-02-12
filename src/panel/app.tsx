@@ -19,7 +19,7 @@ import "./styles/detail-header.css";
 import "./styles/diff-viewer.css";
 
 export function App() {
-  const { requests, selected, selectedId, setSelectedId, clear } =
+  const { requests, selected, selectedId, setSelectedId, clear, addImported } =
     useRequests();
   const { query, setQuery, matches, matchPaths, activeIndex, activePath, next, prev } =
     useJsonSearch(selected?.parsed ?? null);
@@ -77,11 +77,15 @@ export function App() {
     <div class="app">
       <Toolbar
         count={requests.length}
+        filteredCount={filteredRequests.length}
+        requests={requests}
+        filteredRequests={filteredRequests}
         selected={selected}
         diffBase={diffBase}
         onClear={clear}
         onSetDiffBase={handleSetDiffBase}
         onClearDiff={handleClearDiff}
+        onImport={addImported}
       />
       <div class="app__body">
         <div class="app__sidebar" style={{ width: `${sidebarWidth}px` }}>

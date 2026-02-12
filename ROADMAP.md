@@ -22,15 +22,15 @@ Prioritized by competitive gaps (what users of JSON Viewer Pro / tulios/json-vie
 - [x] Filter requests by URL pattern (debounced, case-insensitive)
 - [x] Search clear button (✕) with Escape key support
 - [x] JSON diff — compare two captured responses (set base, select another to diff)
+- [x] Paste/import JSON from clipboard or file (JSON, NDJSON, .har, .txt)
+- [x] Export filtered requests as JSON or HAR 1.2
+- [x] JSON Lines (NDJSON) format support (9 MIME types, auto-detect on parse failure)
 
 ## Up Next
 
 ### High Impact (competitive gaps + most requested)
 - [ ] Large JSON virtualization (perf for 10k+ node responses)
 - [ ] BigInt / numeric precision handling (avoid JS float issues)
-- [ ] JSON Lines (NDJSON) format support
-- [ ] Paste/import JSON from clipboard
-- [ ] Export filtered requests as HAR or JSON
 
 ### Nice to Have
 - [ ] JSONPath query bar (e.g. `$.data[*].name`)

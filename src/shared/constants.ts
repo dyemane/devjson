@@ -8,4 +8,7 @@ export const JSON_MIME_TYPES = [
   "application/hal+json",
   "application/problem+json",
   "application/graphql-response+json",
+  "application/x-ndjson",
+  "application/jsonl",
+  "application/x-jsonlines",
 ];
