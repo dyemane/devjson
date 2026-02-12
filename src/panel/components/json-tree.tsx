@@ -3,9 +3,10 @@ import { JsonNode } from "./json-node";
 interface JsonTreeProps {
   data: unknown;
   matchPaths: Set<string>;
+  activePath: string | null;
 }
 
-export function JsonTree({ data, matchPaths }: JsonTreeProps) {
+export function JsonTree({ data, matchPaths, activePath }: JsonTreeProps) {
   if (data === null || data === undefined) {
     return <div class="json-tree__empty">No JSON body</div>;
   }
@@ -18,6 +19,7 @@ export function JsonTree({ data, matchPaths }: JsonTreeProps) {
         depth={0}
         path=""
         matchPaths={matchPaths}
+        activePath={activePath}
       />
     </div>
   );

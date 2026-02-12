@@ -1,4 +1,4 @@
-import { useMemo, useState } from "preact/hooks";
+import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import type { SearchMatch } from "../types";
 
 export function searchJson(
@@ -51,16 +51,34 @@ export function searchJson(
 
 export function useJsonSearch(parsed: unknown | null) {
   const [query, setQuery] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const matches = useMemo(() => {
     if (!query.trim() || !parsed) return [];
     return searchJson(parsed, query.trim());
   }, [parsed, query]);
 
+  // Reset active index when matches change
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [matches]);
+
   const matchPaths = useMemo(
     () => new Set(matches.map((m) => m.path)),
     [matches],
   );
 
-  return { query, setQuery, matches, matchPaths };
+  const activePath = matches.length > 0 ? matches[activeIndex]?.path ?? null : null;
+
+  const next = useCallback(() => {
+    if (matches.length === 0) return;
+    setActiveIndex((i) => (i + 1) % matches.length);
+  }, [matches.length]);
+
+  const prev = useCallback(() => {
+    if (matches.length === 0) return;
+    setActiveIndex((i) => (i - 1 + matches.length) % matches.length);
+  }, [matches.length]);
+
+  return { query, setQuery, matches, matchPaths, activeIndex, activePath, next, prev };
 }

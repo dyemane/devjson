@@ -71,6 +71,26 @@
   white-space: nowrap;
 }
 
+.search-bar__count--none {
+  color: var(--status-error);
+}
+
+.search-bar__nav {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 10px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 3px;
+}
+
+.search-bar__nav:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
 .search-bar__close {
   background: none;
   border: none;

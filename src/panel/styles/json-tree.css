@@ -17,6 +17,12 @@
   border-radius: 2px;
 }
 
+.json-node--active {
+  background: #6f4b1a;
+  border-radius: 2px;
+  outline: 1px solid #c4842d;
+}
+
 .json-node__toggle {
   cursor: pointer;
   user-select: none;

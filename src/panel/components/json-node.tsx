@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { AUTO_EXPAND_DEPTH } from "../../shared/constants";
 
 interface JsonNodeProps {
@@ -7,6 +7,7 @@ interface JsonNodeProps {
   depth: number;
   path: string;
   matchPaths: Set<string>;
+  activePath: string | null;
 }
 
 function valueClass(value: unknown): string {
@@ -23,16 +24,44 @@ function renderValue(value: unknown): string {
   return String(value);
 }
 
-export function JsonNode({ keyName, value, depth, path, matchPaths }: JsonNodeProps) {
-  const isExpandable =
-    value !== null && typeof value === "object";
-  const [expanded, setExpanded] = useState(depth < AUTO_EXPAND_DEPTH);
+function isAncestorOfActive(path: string, activePath: string | null): boolean {
+  if (!activePath || !path) return false;
+  return activePath.startsWith(path + ".") || activePath.startsWith(path + "[");
+}
+
+export function JsonNode({ keyName, value, depth, path, matchPaths, activePath }: JsonNodeProps) {
+  const isExpandable = value !== null && typeof value === "object";
   const isMatch = matchPaths.has(path);
+  const isActive = activePath === path;
+  const shouldAutoExpand = isAncestorOfActive(path, activePath);
+  const [expanded, setExpanded] = useState(depth < AUTO_EXPAND_DEPTH);
+  const nodeRef = useRef<HTMLDivElement>(null);
+
+  // Auto-expand when a descendant is the active match
+  useEffect(() => {
+    if (shouldAutoExpand && !expanded) {
+      setExpanded(true);
+    }
+  }, [shouldAutoExpand]);
+
+  // Scroll active match into view
+  useEffect(() => {
+    if (isActive && nodeRef.current) {
+      nodeRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [isActive]);
+
+  const matchClass = isActive
+    ? "json-node--active"
+    : isMatch
+      ? "json-node--match"
+      : "";
 
   if (!isExpandable) {
     return (
       <div
-        class={`json-node ${isMatch ? "json-node--match" : ""}`}
+        ref={isActive ? nodeRef : undefined}
+        class={`json-node ${matchClass}`}
         style={{ paddingLeft: `${depth * 16}px` }}
       >
         {keyName !== null && (
@@ -51,8 +80,9 @@ export function JsonNode({ keyName, value, depth, path, matchPaths }: JsonNodePr
   const summary = isArray ? `Array(${entries.length})` : `Object(${entries.length})`;
 
   return (
-    <div class={`json-node ${isMatch ? "json-node--match" : ""}`}>
+    <div class={`json-node ${matchClass}`}>
       <div
+        ref={isActive ? nodeRef : undefined}
         class="json-node__toggle"
         style={{ paddingLeft: `${depth * 16}px` }}
         onClick={() => setExpanded(!expanded)}
@@ -80,6 +110,7 @@ export function JsonNode({ keyName, value, depth, path, matchPaths }: JsonNodePr
                 depth={depth + 1}
                 path={childPath}
                 matchPaths={matchPaths}
+                activePath={activePath}
               />
             );
           })}

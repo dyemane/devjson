@@ -16,9 +16,8 @@ import "./styles/detail-header.css";
 export function App() {
   const { requests, selected, selectedId, setSelectedId, clear } =
     useRequests();
-  const { query, setQuery, matches, matchPaths } = useJsonSearch(
-    selected?.parsed ?? null,
-  );
+  const { query, setQuery, matches, matchPaths, activeIndex, activePath, next, prev } =
+    useJsonSearch(selected?.parsed ?? null);
   const { size: sidebarWidth, onMouseDown: onSidebarResize } = useResize(340);
   const { size: detailHeaderHeight, onMouseDown: onDetailResize } = useResize(
     120,
@@ -58,7 +57,10 @@ export function App() {
             <SearchBar
               query={query}
               matchCount={matches.length}
+              activeIndex={activeIndex}
               onSearch={setQuery}
+              onNext={next}
+              onPrev={prev}
               onClose={closeDetail}
             />
             <div
@@ -76,7 +78,7 @@ export function App() {
                 Parse error: {selected.error}
               </div>
             ) : (
-              <JsonTree data={selected.parsed} matchPaths={matchPaths} />
+              <JsonTree data={selected.parsed} matchPaths={matchPaths} activePath={activePath} />
             )}
           </div>
         )}
