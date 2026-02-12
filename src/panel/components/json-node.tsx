@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { AUTO_EXPAND_DEPTH } from "../../shared/constants";
+import { copyToClipboard } from "../lib/clipboard";
 
 interface JsonNodeProps {
   keyName: string | null;
@@ -8,6 +9,8 @@ interface JsonNodeProps {
   path: string;
   matchPaths: Set<string>;
   activePath: string | null;
+  expandGeneration: number;
+  onHoverPath: (path: string | null) => void;
 }
 
 function valueClass(value: unknown): string {
@@ -29,13 +32,32 @@ function isAncestorOfActive(path: string, activePath: string | null): boolean {
   return activePath.startsWith(path + ".") || activePath.startsWith(path + "[");
 }
 
-export function JsonNode({ keyName, value, depth, path, matchPaths, activePath }: JsonNodeProps) {
+export function JsonNode({
+  keyName,
+  value,
+  depth,
+  path,
+  matchPaths,
+  activePath,
+  expandGeneration,
+  onHoverPath,
+}: JsonNodeProps) {
   const isExpandable = value !== null && typeof value === "object";
   const isMatch = matchPaths.has(path);
   const isActive = activePath === path;
   const shouldAutoExpand = isAncestorOfActive(path, activePath);
   const [expanded, setExpanded] = useState(depth < AUTO_EXPAND_DEPTH);
   const nodeRef = useRef<HTMLDivElement>(null);
+  const prevGeneration = useRef(expandGeneration);
+
+  // Respond to expand/collapse all
+  useEffect(() => {
+    if (expandGeneration !== prevGeneration.current) {
+      // Positive = expand all, negative = collapse all
+      setExpanded(expandGeneration > 0);
+      prevGeneration.current = expandGeneration;
+    }
+  }, [expandGeneration]);
 
   // Auto-expand when a descendant is the active match
   useEffect(() => {
@@ -57,12 +79,17 @@ export function JsonNode({ keyName, value, depth, path, matchPaths, activePath }
       ? "json-node--match"
       : "";
 
+  const handleMouseEnter = () => {
+    if (path) onHoverPath(path);
+  };
+
   if (!isExpandable) {
     return (
       <div
         ref={isActive ? nodeRef : undefined}
         class={`json-node ${matchClass}`}
         style={{ paddingLeft: `${depth * 16}px` }}
+        onMouseEnter={handleMouseEnter}
       >
         {keyName !== null && (
           <span class="json-node__key">{keyName}: </span>
@@ -86,6 +113,7 @@ export function JsonNode({ keyName, value, depth, path, matchPaths, activePath }
         class="json-node__toggle"
         style={{ paddingLeft: `${depth * 16}px` }}
         onClick={() => setExpanded(!expanded)}
+        onMouseEnter={handleMouseEnter}
       >
         <span class="json-node__arrow">{expanded ? "▼" : "▶"}</span>
         {keyName !== null && (
@@ -111,6 +139,8 @@ export function JsonNode({ keyName, value, depth, path, matchPaths, activePath }
                 path={childPath}
                 matchPaths={matchPaths}
                 activePath={activePath}
+                expandGeneration={expandGeneration}
+                onHoverPath={onHoverPath}
               />
             );
           })}
