@@ -107,6 +107,50 @@
   background: rgba(241, 76, 76, 0.14);
 }
 
+.request-item--pinned {
+  border-left: 2px solid var(--accent);
+}
+
+.request-item--pinned:hover {
+  background: var(--bg-hover);
+}
+
+.request-item--pinned.request-item--selected {
+  background: var(--bg-selected);
+}
+
+.request-item__pin {
+  display: none;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
+.request-item:hover .request-item__pin {
+  display: inline;
+}
+
+.request-item__pin--active {
+  display: inline !important;
+  opacity: 1;
+  filter: none;
+}
+
+.request-item__pin:hover {
+  opacity: 1;
+  filter: none;
+}
+
+.request-list__pin-divider {
+  height: 1px;
+  background: var(--accent);
+  opacity: 0.3;
+  margin: 2px 8px;
+}
+
 .request-item__badge {
   font-size: 9px;
   font-weight: 700;

@@ -8,13 +8,20 @@ let importId = 0;
 export function useRequests() {
   const [requests, setRequests] = useState<CapturedRequest[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [pinnedIds, setPinnedIds] = useState<Set<string>>(new Set());
   const initialized = useRef(false);
+  const pinnedRef = useRef(pinnedIds);
+  pinnedRef.current = pinnedIds;
 
   const addRequest = useCallback((req: CapturedRequest) => {
     setRequests((prev) => {
       const next = [...prev, req];
       if (next.length > MAX_REQUESTS) {
-        return next.slice(next.length - MAX_REQUESTS);
+        const pinned = pinnedRef.current;
+        const pinnedItems = next.filter((r) => pinned.has(r.id));
+        const unpinned = next.filter((r) => !pinned.has(r.id));
+        const trimmed = unpinned.slice(unpinned.length - (MAX_REQUESTS - pinnedItems.length));
+        return [...pinnedItems, ...trimmed];
       }
       return next;
     });
@@ -26,9 +33,25 @@ export function useRequests() {
     startIntercepting(addRequest);
   }, [addRequest]);
 
+  const togglePin = useCallback((id: string) => {
+    setPinnedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const clearPins = useCallback(() => {
+    setPinnedIds(new Set());
+  }, []);
+
   const clear = useCallback(() => {
-    setRequests([]);
-    setSelectedId(null);
+    setRequests((prev) => prev.filter((r) => pinnedRef.current.has(r.id)));
+    setSelectedId((prev) => (prev && pinnedRef.current.has(prev) ? prev : null));
   }, []);
 
   const addImported = useCallback(
@@ -59,5 +82,5 @@ export function useRequests() {
 
   const selected = requests.find((r) => r.id === selectedId) ?? null;
 
-  return { requests, selected, selectedId, setSelectedId, clear, addImported };
+  return { requests, selected, selectedId, setSelectedId, clear, addImported, pinnedIds, togglePin, clearPins };
 }

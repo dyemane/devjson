@@ -8,7 +8,9 @@ interface RequestItemProps {
   request: CapturedRequest;
   isSelected: boolean;
   isDiffBase: boolean;
+  isPinned: boolean;
   onClick: () => void;
+  onTogglePin: () => void;
 }
 
 function statusClass(status: number): string {
@@ -17,7 +19,7 @@ function statusClass(status: number): string {
   return "request-item__status--ok";
 }
 
-export function RequestItem({ request, isSelected, isDiffBase, onClick }: RequestItemProps) {
+export function RequestItem({ request, isSelected, isDiffBase, isPinned, onClick, onTogglePin }: RequestItemProps) {
   const itemRef = useRef<HTMLDivElement>(null);
   const [urlCopied, setUrlCopied] = useState(false);
 
@@ -35,9 +37,15 @@ export function RequestItem({ request, isSelected, isDiffBase, onClick }: Reques
     }
   };
 
+  const handlePin = (e: MouseEvent) => {
+    e.stopPropagation();
+    onTogglePin();
+  };
+
   let cls = "request-item";
   if (isSelected) cls += " request-item--selected";
   if (isDiffBase) cls += " request-item--diff-base";
+  if (isPinned) cls += " request-item--pinned";
 
   const copyTip = urlCopied
     ? <><span class="tip__icon">&#x2713;</span> Copied!</>
@@ -51,6 +59,13 @@ export function RequestItem({ request, isSelected, isDiffBase, onClick }: Reques
   return (
     <div ref={itemRef} class={cls} onClick={onClick}>
       {isDiffBase && <span class="request-item__badge">BASE</span>}
+      <span
+        class={`request-item__pin ${isPinned ? "request-item__pin--active" : ""}`}
+        onClick={handlePin}
+        title={isPinned ? "Unpin (b)" : "Pin (b)"}
+      >
+        &#x1F4CC;
+      </span>
       <span class="request-item__method">{request.method}</span>
       <span class="request-item__url">
         {truncateUrl(request.url)}

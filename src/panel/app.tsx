@@ -22,7 +22,7 @@ import "./styles/detail-header.css";
 import "./styles/diff-viewer.css";
 
 export function App() {
-  const { requests, selected, selectedId, setSelectedId, clear, addImported } =
+  const { requests, selected, selectedId, setSelectedId, clear, addImported, pinnedIds, togglePin, clearPins } =
     useRequests();
   const { query, setQuery, matches, matchPaths, activeIndex, activePath, next, prev } =
     useJsonSearch(selected?.parsed ?? null);
@@ -69,6 +69,12 @@ export function App() {
       return haystack.includes(q);
     });
   }, [requests, urlFilter]);
+
+  const sortedRequests = useMemo(() => {
+    const pinned = filteredRequests.filter((r) => pinnedIds.has(r.id));
+    const unpinned = filteredRequests.filter((r) => !pinnedIds.has(r.id));
+    return [...pinned, ...unpinned];
+  }, [filteredRequests, pinnedIds]);
 
   const closeDetail = () => setSelectedId(null);
 
@@ -120,6 +126,15 @@ export function App() {
         return;
       }
 
+      // b — toggle pin on selected request
+      if (e.key === "b") {
+        if (selectedId) {
+          e.preventDefault();
+          togglePin(selectedId);
+        }
+        return;
+      }
+
       // p — toggle JSONPath bar
       if (e.key === "p") {
         if (selected) {
@@ -138,24 +153,24 @@ export function App() {
       // j / ArrowDown — next request
       if (e.key === "j" || (e.key === "ArrowDown" && !isInput)) {
         e.preventDefault();
-        if (filteredRequests.length === 0) return;
+        if (sortedRequests.length === 0) return;
         const currentIdx = selectedId
-          ? filteredRequests.findIndex((r) => r.id === selectedId)
+          ? sortedRequests.findIndex((r) => r.id === selectedId)
           : -1;
-        const nextIdx = Math.min(currentIdx + 1, filteredRequests.length - 1);
-        setSelectedId(filteredRequests[nextIdx].id);
+        const nextIdx = Math.min(currentIdx + 1, sortedRequests.length - 1);
+        setSelectedId(sortedRequests[nextIdx].id);
         return;
       }
 
       // k / ArrowUp — previous request
       if (e.key === "k" || (e.key === "ArrowUp" && !isInput)) {
         e.preventDefault();
-        if (filteredRequests.length === 0) return;
+        if (sortedRequests.length === 0) return;
         const currentIdx = selectedId
-          ? filteredRequests.findIndex((r) => r.id === selectedId)
-          : filteredRequests.length;
+          ? sortedRequests.findIndex((r) => r.id === selectedId)
+          : sortedRequests.length;
         const prevIdx = Math.max(currentIdx - 1, 0);
-        setSelectedId(filteredRequests[prevIdx].id);
+        setSelectedId(sortedRequests[prevIdx].id);
         return;
       }
 
@@ -188,7 +203,7 @@ export function App() {
 
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [filteredRequests, selectedId, selected, query, jpQuery, showJpBar, showHelp, next, prev]);
+  }, [sortedRequests, selectedId, selected, query, jpQuery, showJpBar, showHelp, next, prev, togglePin]);
 
   return (
     <div class="app">
@@ -205,6 +220,8 @@ export function App() {
         onImport={addImported}
         themeId={themeId}
         onThemeChange={setThemeId}
+        pinnedCount={pinnedIds.size}
+        onClearPins={clearPins}
       />
       <div class="app__body">
         <div class="app__sidebar" style={{ width: `${sidebarWidth}px` }}>
@@ -235,14 +252,16 @@ export function App() {
             )}
           </div>
           <div class="sidebar-body">
-            {filteredRequests.length === 0 ? (
+            {sortedRequests.length === 0 ? (
               <EmptyState />
             ) : (
               <RequestList
-                requests={filteredRequests}
+                requests={sortedRequests}
                 selectedId={selectedId}
                 onSelect={setSelectedId}
                 diffBaseId={diffBase?.id ?? null}
+                pinnedIds={pinnedIds}
+                onTogglePin={togglePin}
               />
             )}
           </div>

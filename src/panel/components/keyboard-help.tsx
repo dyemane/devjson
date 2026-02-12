@@ -9,6 +9,7 @@ const shortcuts = [
   { keys: "Escape", desc: "Close detail / clear search" },
   { keys: "/ or Ctrl+F", desc: "Focus search" },
   { keys: "n / Shift+n", desc: "Next / previous search match" },
+  { keys: "b", desc: "Pin / unpin selected request" },
   { keys: "p", desc: "Toggle JSONPath query" },
   { keys: "?", desc: "Toggle this help" },
 ];

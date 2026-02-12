@@ -19,6 +19,8 @@ interface ToolbarProps {
   onImport: (parsed: unknown, label: string) => void;
   themeId: string;
   onThemeChange: (id: string) => void;
+  pinnedCount: number;
+  onClearPins: () => void;
 }
 
 export function Toolbar({
@@ -34,6 +36,8 @@ export function Toolbar({
   onImport,
   themeId,
   onThemeChange,
+  pinnedCount,
+  onClearPins,
 }: ToolbarProps) {
   const [copied, setCopied] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
@@ -109,9 +113,15 @@ export function Toolbar({
   return (
     <div class="toolbar">
       <div class="toolbar__left">
-        <button class="toolbar__btn" onClick={onClear} title="Clear all">
+        <button class="toolbar__btn" onClick={onClear} title={pinnedCount > 0 ? "Clear unpinned requests" : "Clear all"}>
           Clear
+          {pinnedCount > 0 && <span class="toolbar__pin-badge">{pinnedCount} pinned</span>}
         </button>
+        {pinnedCount > 0 && (
+          <button class="toolbar__btn" onClick={onClearPins} title="Unpin all requests">
+            Clear Pins
+          </button>
+        )}
         <span class="toolbar__count">
           {count} request{count !== 1 ? "s" : ""}
         </span>

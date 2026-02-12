@@ -42,6 +42,16 @@
   background: var(--accent);
 }
 
+.toolbar__pin-badge {
+  font-size: 9px;
+  color: var(--accent);
+  background: rgba(var(--accent-rgb, 100, 149, 237), 0.15);
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin-left: 6px;
+  font-weight: 600;
+}
+
 .toolbar__count {
   color: var(--text-secondary);
   font-size: 11px;
