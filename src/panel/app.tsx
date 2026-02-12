@@ -1,7 +1,8 @@
-import { useCallback, useMemo, useRef, useState } from "preact/hooks";
+import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { useRequests } from "./hooks/use-requests";
 import { useJsonSearch } from "./hooks/use-json-search";
 import { useResize } from "./hooks/use-resize";
+import { useTheme } from "./hooks/use-theme";
 import { Toolbar } from "./components/toolbar";
 import { RequestList } from "./components/request-list";
 import { DetailHeader } from "./components/detail-header";
@@ -9,6 +10,7 @@ import { JsonTree } from "./components/json-tree";
 import { SearchBar } from "./components/search-bar";
 import { EmptyState } from "./components/empty-state";
 import { DiffViewer } from "./components/diff-viewer";
+import { KeyboardHelp } from "./components/keyboard-help";
 import { SEARCH_DEBOUNCE_MS } from "../shared/constants";
 import type { CapturedRequest } from "./types";
 import "./styles/panel.css";
@@ -31,10 +33,14 @@ export function App() {
     "vertical",
   );
 
+  const { themeId, setThemeId } = useTheme();
+
   const [urlFilter, setUrlFilter] = useState("");
   const filterTimer = useRef<ReturnType<typeof setTimeout>>();
   const filterInputRef = useRef<HTMLInputElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [diffBase, setDiffBase] = useState<CapturedRequest | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   const handleFilterInput = useCallback((e: Event) => {
     const value = (e.target as HTMLInputElement).value;
@@ -73,6 +79,91 @@ export function App() {
   // In diff mode, selecting a request shows the diff
   const showDiff = diffBase && selected && diffBase.id !== selected.id;
 
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isInput = target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable;
+
+      // ? toggles help (always works)
+      if (e.key === "?" && !isInput) {
+        e.preventDefault();
+        setShowHelp((v) => !v);
+        return;
+      }
+
+      // Close help on Escape
+      if (e.key === "Escape" && showHelp) {
+        e.preventDefault();
+        setShowHelp(false);
+        return;
+      }
+
+      // Don't intercept when typing in inputs (except Escape and Ctrl+F)
+      if (isInput && e.key !== "Escape" && !(e.key === "f" && (e.ctrlKey || e.metaKey))) {
+        return;
+      }
+
+      // / or Ctrl+F — focus search input
+      if (e.key === "/" || (e.key === "f" && (e.ctrlKey || e.metaKey))) {
+        if (selected && searchInputRef.current) {
+          e.preventDefault();
+          searchInputRef.current.focus();
+        }
+        return;
+      }
+
+      // j / ArrowDown — next request
+      if (e.key === "j" || (e.key === "ArrowDown" && !isInput)) {
+        e.preventDefault();
+        if (filteredRequests.length === 0) return;
+        const currentIdx = selectedId
+          ? filteredRequests.findIndex((r) => r.id === selectedId)
+          : -1;
+        const nextIdx = Math.min(currentIdx + 1, filteredRequests.length - 1);
+        setSelectedId(filteredRequests[nextIdx].id);
+        return;
+      }
+
+      // k / ArrowUp — previous request
+      if (e.key === "k" || (e.key === "ArrowUp" && !isInput)) {
+        e.preventDefault();
+        if (filteredRequests.length === 0) return;
+        const currentIdx = selectedId
+          ? filteredRequests.findIndex((r) => r.id === selectedId)
+          : filteredRequests.length;
+        const prevIdx = Math.max(currentIdx - 1, 0);
+        setSelectedId(filteredRequests[prevIdx].id);
+        return;
+      }
+
+      // n — next search match, N (shift+n) — previous
+      if (e.key === "n" && !isInput) {
+        e.preventDefault();
+        if (e.shiftKey) {
+          prev();
+        } else {
+          next();
+        }
+        return;
+      }
+
+      // Escape — close detail pane
+      if (e.key === "Escape") {
+        e.preventDefault();
+        if (query) {
+          setQuery("");
+        } else {
+          closeDetail();
+        }
+        return;
+      }
+    };
+
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [filteredRequests, selectedId, selected, query, showHelp, next, prev]);
+
   return (
     <div class="app">
       <Toolbar
@@ -86,6 +177,8 @@ export function App() {
         onSetDiffBase={handleSetDiffBase}
         onClearDiff={handleClearDiff}
         onImport={addImported}
+        themeId={themeId}
+        onThemeChange={setThemeId}
       />
       <div class="app__body">
         <div class="app__sidebar" style={{ width: `${sidebarWidth}px` }}>
@@ -145,6 +238,7 @@ export function App() {
               onNext={next}
               onPrev={prev}
               onClose={closeDetail}
+              inputRef={searchInputRef}
             />
             <div
               class="app__detail-top"
@@ -170,10 +264,13 @@ export function App() {
           </div>
         ) : (
           <div class="app__no-selection">
-            {requests.length > 0 ? "Select a request to view JSON" : ""}
+            {requests.length > 0
+              ? "Select a request to view JSON (press ? for shortcuts)"
+              : ""}
           </div>
         )}
       </div>
+      {showHelp && <KeyboardHelp onClose={() => setShowHelp(false)} />}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "preact/hooks";
 import type { CapturedRequest } from "../types";
 import { truncateUrl, formatSize } from "../lib/json-utils";
 
@@ -15,12 +16,20 @@ function statusClass(status: number): string {
 }
 
 export function RequestItem({ request, isSelected, isDiffBase, onClick }: RequestItemProps) {
+  const itemRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isSelected && itemRef.current) {
+      itemRef.current.scrollIntoView({ block: "nearest" });
+    }
+  }, [isSelected]);
+
   let cls = "request-item";
   if (isSelected) cls += " request-item--selected";
   if (isDiffBase) cls += " request-item--diff-base";
 
   return (
-    <div class={cls} onClick={onClick}>
+    <div ref={itemRef} class={cls} onClick={onClick}>
       {isDiffBase && <span class="request-item__badge">BASE</span>}
       <span class="request-item__method">{request.method}</span>
       <span class="request-item__url" title={request.url}>

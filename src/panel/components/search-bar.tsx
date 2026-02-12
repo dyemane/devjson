@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "preact/hooks";
+import { useCallback, useEffect, useRef } from "preact/hooks";
 import { SEARCH_DEBOUNCE_MS } from "../../shared/constants";
 
 interface SearchBarProps {
@@ -9,6 +9,7 @@ interface SearchBarProps {
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
+  inputRef?: { current: HTMLInputElement | null };
 }
 
 export function SearchBar({
@@ -19,9 +20,19 @@ export function SearchBar({
   onNext,
   onPrev,
   onClose,
+  inputRef: externalRef,
 }: SearchBarProps) {
   const timer = useRef<ReturnType<typeof setTimeout>>();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const internalRef = useRef<HTMLInputElement>(null);
+
+  // Sync internal ref to external ref so parent can focus the input
+  useEffect(() => {
+    if (externalRef) {
+      externalRef.current = internalRef.current;
+    }
+  });
+
+  const inputRef = internalRef;
 
   const handleInput = useCallback(
     (e: Event) => {

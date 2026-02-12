@@ -28,10 +28,11 @@ Prioritized by competitive gaps (what users of JSON Viewer Pro / tulios/json-vie
 - [x] BigInt / numeric precision handling (safe parse with sentinel, `n` badge, precision-preserving copy)
 - [x] Large JSON virtualization (chunk-based lazy rendering, 100 items per chunk, "Show more" / "Show all", node count indicator)
 
+- [x] Syntax themes — Dark, Light, Monokai, Solarized (persisted in localStorage)
+- [x] Keyboard navigation — j/k requests, n/N search matches, / to search, ? for help overlay
+
 ### Nice to Have
 - [ ] JSONPath query bar (e.g. `$.data[*].name`)
-- [ ] Syntax themes (light mode, Monokai, Solarized)
-- [ ] Keyboard-only navigation (j/k through requests, arrow keys in tree)
 - [ ] Pin/bookmark specific requests
 - [ ] Request timing waterfall visualization
 

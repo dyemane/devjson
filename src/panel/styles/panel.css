@@ -183,6 +183,86 @@ body,
   color: var(--status-error);
 }
 
+.app__no-selection {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.keyboard-help__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.keyboard-help {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: 320px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.keyboard-help__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.keyboard-help__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.keyboard-help__close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 3px;
+}
+
+.keyboard-help__close:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.keyboard-help__body {
+  padding: 8px 14px;
+}
+
+.keyboard-help__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.keyboard-help__keys {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+  min-width: 120px;
+}
+
+.keyboard-help__desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;

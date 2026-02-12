@@ -3,6 +3,7 @@ import { copyToClipboard } from "../lib/clipboard";
 import { formatJson } from "../lib/json-utils";
 import { parseImportedText, readFileAsImport } from "../lib/import-json";
 import { exportAsJson, exportAsHar } from "../lib/export";
+import { ThemePicker } from "./theme-picker";
 import type { CapturedRequest } from "../types";
 
 interface ToolbarProps {
@@ -16,6 +17,8 @@ interface ToolbarProps {
   onSetDiffBase: () => void;
   onClearDiff: () => void;
   onImport: (parsed: unknown, label: string) => void;
+  themeId: string;
+  onThemeChange: (id: string) => void;
 }
 
 export function Toolbar({
@@ -29,6 +32,8 @@ export function Toolbar({
   onSetDiffBase,
   onClearDiff,
   onImport,
+  themeId,
+  onThemeChange,
 }: ToolbarProps) {
   const [copied, setCopied] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
@@ -110,6 +115,7 @@ export function Toolbar({
         <span class="toolbar__count">
           {count} request{count !== 1 ? "s" : ""}
         </span>
+        <ThemePicker themeId={themeId} onSelect={onThemeChange} />
       </div>
       <div class="toolbar__right">
         {importError && (

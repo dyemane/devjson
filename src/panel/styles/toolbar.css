@@ -88,8 +88,23 @@
   background: var(--bg-hover);
 }
 
+.toolbar__dropdown-item--active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .toolbar__dropdown-item + .toolbar__dropdown-item {
   border-top: 1px solid var(--border);
+}
+
+.theme-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid;
+  margin-right: 6px;
+  vertical-align: middle;
 }
 
 .search-bar {
