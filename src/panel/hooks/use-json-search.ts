@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import type { SearchMatch } from "../types";
+import { isBigIntValue, unwrapBigInt } from "../lib/safe-json";
 
 export function searchJson(
   value: unknown,
@@ -19,7 +20,12 @@ export function searchJson(
         matches.push({ path: currentPath, key, value: String(val) });
       }
 
-      if (typeof val === "string" && val.toLowerCase().includes(lowerQuery)) {
+      if (isBigIntValue(val)) {
+        const raw = unwrapBigInt(val);
+        if (raw.includes(lowerQuery)) {
+          matches.push({ path: currentPath, key, value: raw });
+        }
+      } else if (typeof val === "string" && val.toLowerCase().includes(lowerQuery)) {
         matches.push({ path: currentPath, key, value: val });
       } else if (
         typeof val === "number" || typeof val === "boolean"

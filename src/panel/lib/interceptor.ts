@@ -1,6 +1,7 @@
 import type { CapturedRequest } from "../types";
 import { JSON_MIME_TYPES } from "../../shared/constants";
 import { isNdjsonMime, tryParseNdjson } from "./ndjson";
+import { safeJsonParse } from "./safe-json";
 
 let requestId = 0;
 
@@ -44,7 +45,7 @@ export function startIntercepting(
 
         if (body) {
           try {
-            parsed = JSON.parse(body);
+            parsed = safeJsonParse(body);
           } catch {
             // If standard parse fails, try NDJSON
             if (isNdjsonMime(mime) || body.includes("\n")) {

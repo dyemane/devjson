@@ -25,12 +25,8 @@ Prioritized by competitive gaps (what users of JSON Viewer Pro / tulios/json-vie
 - [x] Paste/import JSON from clipboard or file (JSON, NDJSON, .har, .txt)
 - [x] Export filtered requests as JSON or HAR 1.2
 - [x] JSON Lines (NDJSON) format support (9 MIME types, auto-detect on parse failure)
-
-## Up Next
-
-### High Impact (competitive gaps + most requested)
-- [ ] Large JSON virtualization (perf for 10k+ node responses)
-- [ ] BigInt / numeric precision handling (avoid JS float issues)
+- [x] BigInt / numeric precision handling (safe parse with sentinel, `n` badge, precision-preserving copy)
+- [x] Large JSON virtualization (chunk-based lazy rendering, 100 items per chunk, "Show more" / "Show all", node count indicator)
 
 ### Nice to Have
 - [ ] JSONPath query bar (e.g. `$.data[*].name`)

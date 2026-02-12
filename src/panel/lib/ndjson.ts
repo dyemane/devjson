@@ -1,3 +1,5 @@
+import { safeJsonParse } from "./safe-json";
+
 /**
  * Detect and parse NDJSON (newline-delimited JSON / JSON Lines).
  *
@@ -16,7 +18,7 @@ export function tryParseNdjson(body: string): { parsed: unknown; error: string |
   const results: unknown[] = [];
   for (let i = 0; i < lines.length; i++) {
     try {
-      results.push(JSON.parse(lines[i]));
+      results.push(safeJsonParse(lines[i]));
     } catch {
       return { parsed: null, error: `NDJSON parse error on line ${i + 1}` };
     }

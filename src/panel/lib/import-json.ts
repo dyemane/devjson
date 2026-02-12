@@ -1,4 +1,5 @@
 import { tryParseNdjson } from "./ndjson";
+import { safeJsonParse } from "./safe-json";
 
 export interface ImportResult {
   parsed: unknown;
@@ -18,7 +19,7 @@ export function parseImportedText(text: string): ImportResult {
 
   // Try standard JSON first
   try {
-    const parsed = JSON.parse(trimmed);
+    const parsed = safeJsonParse(trimmed);
     const label = Array.isArray(parsed)
       ? `pasted Array(${parsed.length})`
       : typeof parsed === "object" && parsed !== null

@@ -1,6 +1,7 @@
-import { useCallback, useState } from "preact/hooks";
+import { useCallback, useMemo, useState } from "preact/hooks";
 import { JsonNode } from "./json-node";
 import { copyToClipboard } from "../lib/clipboard";
+import { countNodes } from "../lib/json-utils";
 
 interface JsonTreeProps {
   data: unknown;
@@ -42,6 +43,8 @@ export function JsonTree({ data, matchPaths, activePath }: JsonTreeProps) {
     }
   };
 
+  const nodeCount = useMemo(() => (data != null ? countNodes(data) : 0), [data]);
+
   if (data === null || data === undefined) {
     return <div class="json-tree__empty">No JSON body</div>;
   }
@@ -55,6 +58,9 @@ export function JsonTree({ data, matchPaths, activePath }: JsonTreeProps) {
         <button class="json-tree__btn" onClick={collapseAll}>
           Collapse All
         </button>
+        {nodeCount > 100 && (
+          <span class="json-tree__node-count">{nodeCount.toLocaleString()} nodes</span>
+        )}
       </div>
       <div class="json-tree__body">
         <JsonNode

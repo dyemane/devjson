@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { AUTO_EXPAND_DEPTH } from "../../shared/constants";
+import { AUTO_EXPAND_DEPTH, CHUNK_SIZE } from "../../shared/constants";
 import { copyToClipboard } from "../lib/clipboard";
+import { isBigIntValue, unwrapBigInt } from "../lib/safe-json";
 
 interface JsonNodeProps {
   keyName: string | null;
@@ -15,6 +16,7 @@ interface JsonNodeProps {
 
 function valueClass(value: unknown): string {
   if (value === null) return "json-node__value--null";
+  if (isBigIntValue(value)) return "json-node__value--number";
   if (typeof value === "string") return "json-node__value--string";
   if (typeof value === "number") return "json-node__value--number";
   if (typeof value === "boolean") return "json-node__value--boolean";
@@ -23,6 +25,7 @@ function valueClass(value: unknown): string {
 
 function renderValue(value: unknown): string {
   if (value === null) return "null";
+  if (isBigIntValue(value)) return unwrapBigInt(value);
   if (typeof value === "string") return `"${value}"`;
   return String(value);
 }
@@ -47,15 +50,19 @@ export function JsonNode({
   const isActive = activePath === path;
   const shouldAutoExpand = isAncestorOfActive(path, activePath);
   const [expanded, setExpanded] = useState(depth < AUTO_EXPAND_DEPTH);
+  const [visibleCount, setVisibleCount] = useState(CHUNK_SIZE);
   const nodeRef = useRef<HTMLDivElement>(null);
   const prevGeneration = useRef(expandGeneration);
 
   // Respond to expand/collapse all
   useEffect(() => {
     if (expandGeneration !== prevGeneration.current) {
-      // Positive = expand all, negative = collapse all
       setExpanded(expandGeneration > 0);
       prevGeneration.current = expandGeneration;
+      // Reset visible count when collapsing all
+      if (expandGeneration < 0) {
+        setVisibleCount(CHUNK_SIZE);
+      }
     }
   }, [expandGeneration]);
 
@@ -72,6 +79,28 @@ export function JsonNode({
       nodeRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   }, [isActive]);
+
+  // If active match is beyond visible chunk, expand the visible range
+  useEffect(() => {
+    if (!activePath || !expanded || !isExpandable) return;
+    const entries = Array.isArray(value)
+      ? (value as unknown[])
+      : Object.entries(value as Record<string, unknown>);
+    const total = Array.isArray(value) ? entries.length : (entries as [string, unknown][]).length;
+    if (visibleCount >= total) return;
+
+    // Check if active path is in a child beyond visible range
+    for (let i = visibleCount; i < total; i++) {
+      const k = Array.isArray(value) ? String(i) : (entries as [string, unknown][])[i][0];
+      const childPath = Array.isArray(value)
+        ? `${path}[${k}]`
+        : path ? `${path}.${k}` : k;
+      if (activePath === childPath || activePath.startsWith(childPath + ".") || activePath.startsWith(childPath + "[")) {
+        setVisibleCount(Math.min(i + CHUNK_SIZE, total));
+        break;
+      }
+    }
+  }, [activePath, expanded, visibleCount]);
 
   const matchClass = isActive
     ? "json-node--active"
@@ -95,6 +124,9 @@ export function JsonNode({
           <span class="json-node__key">{keyName}: </span>
         )}
         <span class={valueClass(value)}>{renderValue(value)}</span>
+        {isBigIntValue(value) && (
+          <span class="json-node__bigint-badge" title="Large integer — original precision preserved">n</span>
+        )}
       </div>
     );
   }
@@ -106,13 +138,30 @@ export function JsonNode({
   const bracket = isArray ? ["[", "]"] : ["{", "}"];
   const summary = isArray ? `Array(${entries.length})` : `Object(${entries.length})`;
 
+  const totalEntries = entries.length;
+  const visibleEntries = entries.slice(0, visibleCount);
+  const hasMore = visibleCount < totalEntries;
+  const remaining = totalEntries - visibleCount;
+
+  const handleShowMore = () => {
+    setVisibleCount((c) => Math.min(c + CHUNK_SIZE, totalEntries));
+  };
+
+  const handleShowAll = () => {
+    setVisibleCount(totalEntries);
+  };
+
   return (
     <div class={`json-node ${matchClass}`}>
       <div
         ref={isActive ? nodeRef : undefined}
         class="json-node__toggle"
         style={{ paddingLeft: `${depth * 16}px` }}
-        onClick={() => setExpanded(!expanded)}
+        onClick={() => {
+          const next = !expanded;
+          setExpanded(next);
+          if (!next) setVisibleCount(CHUNK_SIZE);
+        }}
         onMouseEnter={handleMouseEnter}
       >
         <span class="json-node__arrow">{expanded ? "▼" : "▶"}</span>
@@ -128,7 +177,7 @@ export function JsonNode({
       </div>
       {expanded && (
         <>
-          {entries.map(([k, v]) => {
+          {visibleEntries.map(([k, v]) => {
             const childPath = isArray ? `${path}[${k}]` : path ? `${path}.${k}` : k;
             return (
               <JsonNode
@@ -144,6 +193,21 @@ export function JsonNode({
               />
             );
           })}
+          {hasMore && (
+            <div
+              class="json-node__show-more"
+              style={{ paddingLeft: `${(depth + 1) * 16}px` }}
+            >
+              <button class="json-node__show-more-btn" onClick={handleShowMore}>
+                Show {Math.min(CHUNK_SIZE, remaining)} more
+              </button>
+              {remaining > CHUNK_SIZE && (
+                <button class="json-node__show-more-btn" onClick={handleShowAll}>
+                  Show all ({remaining})
+                </button>
+              )}
+            </div>
+          )}
           <div style={{ paddingLeft: `${depth * 16}px` }}>
             <span class="json-node__bracket">{bracket[1]}</span>
           </div>

@@ -4,8 +4,16 @@ export function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+import { BIGINT_PREFIX } from "./safe-json";
+
 export function formatJson(value: unknown): string {
-  return JSON.stringify(value, null, 2);
+  // Replace BigInt sentinel strings back to raw numbers in output
+  const json = JSON.stringify(value, null, 2);
+  const escaped = BIGINT_PREFIX.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return json.replace(
+    new RegExp(`"${escaped}(-?\\d+)"`, "g"),
+    (_match, num) => num,
+  );
 }
 
 export function truncateUrl(url: string, maxLength = 60): string {
