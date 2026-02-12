@@ -19,7 +19,13 @@ export function App() {
   const { query, setQuery, matches, matchPaths } = useJsonSearch(
     selected?.parsed ?? null,
   );
-  const { width: sidebarWidth, onMouseDown } = useResize(340);
+  const { size: sidebarWidth, onMouseDown: onSidebarResize } = useResize(340);
+  const { size: detailHeaderHeight, onMouseDown: onDetailResize } = useResize(
+    120,
+    60,
+    500,
+    "vertical",
+  );
 
   const closeDetail = () => setSelectedId(null);
 
@@ -46,18 +52,25 @@ export function App() {
             )}
           </div>
         </div>
-        <div class="app__resize-handle" onMouseDown={onMouseDown} />
+        <div class="app__resize-handle" onMouseDown={onSidebarResize} />
         {selected && (
           <div class="app__detail">
-            <div class="detail-toolbar">
-              <SearchBar
-                query={query}
-                matchCount={matches.length}
-                onSearch={setQuery}
-                onClose={closeDetail}
-              />
+            <SearchBar
+              query={query}
+              matchCount={matches.length}
+              onSearch={setQuery}
+              onClose={closeDetail}
+            />
+            <div
+              class="app__detail-top"
+              style={{ height: `${detailHeaderHeight}px` }}
+            >
+              <DetailHeader request={selected} />
             </div>
-            <DetailHeader request={selected} />
+            <div
+              class="app__resize-handle--horizontal"
+              onMouseDown={onDetailResize}
+            />
             {selected.error ? (
               <div class="app__parse-error">
                 Parse error: {selected.error}

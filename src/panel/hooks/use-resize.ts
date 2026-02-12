@@ -1,23 +1,31 @@
 import { useCallback, useRef, useState } from "preact/hooks";
 
-export function useResize(initialWidth: number, minWidth = 150, maxWidth = 800) {
-  const [width, setWidth] = useState(initialWidth);
+type Direction = "horizontal" | "vertical";
+
+export function useResize(
+  initialSize: number,
+  min = 150,
+  max = 800,
+  direction: Direction = "horizontal",
+) {
+  const [size, setSize] = useState(initialSize);
   const dragging = useRef(false);
-  const startX = useRef(0);
-  const startWidth = useRef(0);
+  const startPos = useRef(0);
+  const startSize = useRef(0);
 
   const onMouseDown = useCallback(
     (e: MouseEvent) => {
       e.preventDefault();
       dragging.current = true;
-      startX.current = e.clientX;
-      startWidth.current = width;
+      startPos.current = direction === "horizontal" ? e.clientX : e.clientY;
+      startSize.current = size;
 
       const onMouseMove = (e: MouseEvent) => {
         if (!dragging.current) return;
-        const delta = e.clientX - startX.current;
-        const next = Math.min(maxWidth, Math.max(minWidth, startWidth.current + delta));
-        setWidth(next);
+        const pos = direction === "horizontal" ? e.clientX : e.clientY;
+        const delta = pos - startPos.current;
+        const next = Math.min(max, Math.max(min, startSize.current + delta));
+        setSize(next);
       };
 
       const onMouseUp = () => {
@@ -28,13 +36,14 @@ export function useResize(initialWidth: number, minWidth = 150, maxWidth = 800) 
         document.body.style.userSelect = "";
       };
 
-      document.body.style.cursor = "col-resize";
+      document.body.style.cursor =
+        direction === "horizontal" ? "col-resize" : "row-resize";
       document.body.style.userSelect = "none";
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     },
-    [width, minWidth, maxWidth],
+    [size, min, max, direction],
   );
 
-  return { width, onMouseDown };
+  return { size, onMouseDown };
 }

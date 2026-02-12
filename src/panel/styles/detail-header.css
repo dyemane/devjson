@@ -1,7 +1,5 @@
 .detail-header {
-  border-bottom: 1px solid var(--border);
   background: var(--bg-secondary);
-  flex-shrink: 0;
 }
 
 .detail-header__summary {
@@ -66,8 +64,6 @@
 
 .detail-header__headers {
   border-top: 1px solid var(--border);
-  max-height: 300px;
-  overflow-y: auto;
 }
 
 .detail-header__section {

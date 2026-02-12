@@ -103,6 +103,25 @@ body,
   background: var(--accent);
 }
 
+.app__resize-handle--horizontal {
+  height: 4px;
+  cursor: row-resize;
+  background: transparent;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.app__resize-handle--horizontal:hover,
+.app__resize-handle--horizontal:active {
+  background: var(--accent);
+}
+
+.app__detail-top {
+  flex-shrink: 0;
+  overflow-y: auto;
+  border-bottom: 1px solid var(--border);
+}
+
 .app__detail {
   flex: 1;
   display: flex;
