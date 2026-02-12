@@ -9,7 +9,8 @@
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
     "lint": "biome check src/",
-    "lint:fix": "biome check --fix src/"
+    "lint:fix": "biome check --fix src/",
+    "package": "npm run build && cd dist && zip -r ../devjson-1.0.0.zip . && cd .. && echo 'Packaged: devjson-1.0.0.zip'"
   },
   "dependencies": {
     "preact": "^10.25.0"
