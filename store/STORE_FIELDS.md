@@ -1,16 +1,11 @@
-# Chrome Web Store Listing
+# Chrome Web Store — Copy/Paste Fields
 
-## Name
-DevJSON — JSON API Inspector
+## Description
 
-## Short Description (132 chars max)
-Intercept, format, search, diff, and export JSON API responses in DevTools. Zero permissions. Fast and lightweight.
-
-## Detailed Description
-
+```
 DevJSON adds a dedicated panel to Chrome DevTools for inspecting JSON API responses. Open DevTools, click the DevJSON tab, and every JSON response is automatically captured, formatted, and browsable.
 
-**Why DevJSON?**
+Why DevJSON?
 Built as a modern alternative to JSON Viewer Pro (unmaintained since 2023). Zero permissions, no data collection, and packed with features the competition lacks.
 
 CORE FEATURES
@@ -48,44 +43,41 @@ PRIVACY FIRST
 - Zero permissions — no host access, no tabs, no storage permissions
 - No background scripts, no content scripts
 - No analytics, no tracking, no network requests
-- Open source: https://github.com/dyemane/devjson
-
-LIGHTWEIGHT
-
-- ~42KB total JavaScript bundle (Preact, not React)
-- Pure CSS, no runtime CSS-in-JS overhead
-- No external dependencies at runtime
+- Lightweight: ~42KB total JavaScript bundle (Preact, not React)
+```
 
 ## Category
+
+```
 Developer Tools
+```
 
 ## Language
+
+```
 English
+```
 
-## Tags
-json, api, devtools, developer tools, inspector, network, debug, json viewer, rest api, ndjson
+## Store Icon (128x128)
 
-## Screenshots Needed
-1. Main view — request list + JSON tree with search highlighting (1280x800)
-2. JSON diff — two responses compared side by side (1280x800)
-3. Theme picker — showing Monokai or Light theme (1280x800)
-4. BigInt badge — response with large integer values (1280x800)
-5. Keyboard help overlay (1280x800)
+```
+/Users/dyemane/dev/devjson/public/icons/icon-128.png
+```
 
-## Promotional Images Needed
-- Small tile: 440x280 (required)
-- Large tile: 920x680 (optional, recommended)
-- Marquee: 1400x560 (optional)
+## Homepage URL
 
-## Screenshot Instructions
-1. Open any page with JSON APIs (GitHub, any SPA with REST/GraphQL)
-2. Open DevTools > DevJSON tab
-3. Let a few requests populate
-4. For each screenshot:
-   - Resize DevTools window to ~1280px wide
-   - Use Chrome's built-in screenshot: Ctrl+Shift+P > "Capture screenshot"
-   - Or use a screenshot tool at 1280x800
+```
+https://github.com/dyemane/devjson
+```
+
+## Support URL
+
+```
+https://github.com/dyemane/devjson/issues
+```
 
 ## Privacy Policy URL
-Host PRIVACY.md as a GitHub page or link directly to:
+
+```
 https://github.com/dyemane/devjson/blob/master/PRIVACY.md
+```
