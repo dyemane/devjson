@@ -40,6 +40,28 @@
   font-size: 11px;
 }
 
+.request-item__copy {
+  display: none;
+  font-size: 10px;
+  color: var(--text-muted);
+  cursor: copy;
+  padding: 0 2px;
+  flex-shrink: 0;
+}
+
+.request-item:hover .request-item__copy {
+  display: inline;
+}
+
+.request-item__copy:hover {
+  color: var(--text-primary);
+}
+
+.request-item__copy--copied {
+  display: inline !important;
+  color: var(--status-ok) !important;
+}
+
 .request-item__status {
   font-size: 11px;
   min-width: 28px;

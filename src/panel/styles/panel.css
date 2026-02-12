@@ -263,6 +263,22 @@ body,
   color: var(--text-secondary);
 }
 
+/* Copyable — shared click-to-copy affordance */
+.copyable {
+  cursor: copy;
+  border-radius: 2px;
+  transition: background 0.15s;
+}
+
+.copyable:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.copyable--copied {
+  background: rgba(78, 201, 176, 0.2) !important;
+  transition: background 0s;
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;

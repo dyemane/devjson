@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import type { CapturedRequest } from "../types";
 import { truncateUrl, formatSize } from "../lib/json-utils";
+import { copyToClipboard } from "../lib/clipboard";
 
 interface RequestItemProps {
   request: CapturedRequest;
@@ -17,12 +18,21 @@ function statusClass(status: number): string {
 
 export function RequestItem({ request, isSelected, isDiffBase, onClick }: RequestItemProps) {
   const itemRef = useRef<HTMLDivElement>(null);
+  const [urlCopied, setUrlCopied] = useState(false);
 
   useEffect(() => {
     if (isSelected && itemRef.current) {
       itemRef.current.scrollIntoView({ block: "nearest" });
     }
   }, [isSelected]);
+
+  const handleCopyUrl = (e: MouseEvent) => {
+    e.stopPropagation();
+    if (copyToClipboard(request.url)) {
+      setUrlCopied(true);
+      setTimeout(() => setUrlCopied(false), 1200);
+    }
+  };
 
   let cls = "request-item";
   if (isSelected) cls += " request-item--selected";
@@ -34,6 +44,13 @@ export function RequestItem({ request, isSelected, isDiffBase, onClick }: Reques
       <span class="request-item__method">{request.method}</span>
       <span class="request-item__url" title={request.url}>
         {truncateUrl(request.url)}
+      </span>
+      <span
+        class={`request-item__copy ${urlCopied ? "request-item__copy--copied" : ""}`}
+        onClick={handleCopyUrl}
+        title={urlCopied ? "Copied!" : "Copy URL"}
+      >
+        {urlCopied ? "\u2713" : "\u2398"}
       </span>
       <span class={`request-item__status ${statusClass(request.status)}`}>
         {request.status}

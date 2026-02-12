@@ -161,6 +161,30 @@
   border-style: solid;
 }
 
+.json-node__copy-subtree {
+  display: none;
+  margin-left: 8px;
+  font-size: 10px;
+  color: var(--text-muted);
+  cursor: copy;
+  padding: 0 4px;
+  border-radius: 2px;
+}
+
+.json-node__toggle:hover .json-node__copy-subtree {
+  display: inline;
+}
+
+.json-node__copy-subtree:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.json-node__copy-subtree--copied {
+  display: inline !important;
+  color: var(--status-ok) !important;
+}
+
 .json-node__bigint-badge {
   display: inline-block;
   margin-left: 4px;

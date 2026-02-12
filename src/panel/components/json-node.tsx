@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { AUTO_EXPAND_DEPTH, CHUNK_SIZE } from "../../shared/constants";
 import { copyToClipboard } from "../lib/clipboard";
+import { formatJson } from "../lib/json-utils";
 import { isBigIntValue, unwrapBigInt } from "../lib/safe-json";
+import { Copyable } from "./copyable";
 
 interface JsonNodeProps {
   keyName: string | null;
@@ -30,6 +32,14 @@ function renderValue(value: unknown): string {
   return String(value);
 }
 
+/** Raw value for clipboard — strings without quotes, BigInts as plain numbers */
+function rawCopyValue(value: unknown): string {
+  if (value === null) return "null";
+  if (isBigIntValue(value)) return unwrapBigInt(value);
+  if (typeof value === "string") return value;
+  return String(value);
+}
+
 function isAncestorOfActive(path: string, activePath: string | null): boolean {
   if (!activePath || !path) return false;
   return activePath.startsWith(path + ".") || activePath.startsWith(path + "[");
@@ -51,6 +61,7 @@ export function JsonNode({
   const shouldAutoExpand = isAncestorOfActive(path, activePath);
   const [expanded, setExpanded] = useState(depth < AUTO_EXPAND_DEPTH);
   const [visibleCount, setVisibleCount] = useState(CHUNK_SIZE);
+  const [subtreeCopied, setSubtreeCopied] = useState(false);
   const nodeRef = useRef<HTMLDivElement>(null);
   const prevGeneration = useRef(expandGeneration);
 
@@ -112,6 +123,14 @@ export function JsonNode({
     if (path) onHoverPath(path);
   };
 
+  const handleCopySubtree = (e: MouseEvent) => {
+    e.stopPropagation();
+    if (copyToClipboard(formatJson(value))) {
+      setSubtreeCopied(true);
+      setTimeout(() => setSubtreeCopied(false), 1200);
+    }
+  };
+
   if (!isExpandable) {
     return (
       <div
@@ -121,9 +140,13 @@ export function JsonNode({
         onMouseEnter={handleMouseEnter}
       >
         {keyName !== null && (
-          <span class="json-node__key">{keyName}: </span>
+          <Copyable text={keyName} class="json-node__key" title={`Copy key "${keyName}"`}>
+            {keyName}:{" "}
+          </Copyable>
         )}
-        <span class={valueClass(value)}>{renderValue(value)}</span>
+        <Copyable text={rawCopyValue(value)} class={valueClass(value)} title="Click to copy value">
+          {renderValue(value)}
+        </Copyable>
         {isBigIntValue(value) && (
           <span class="json-node__bigint-badge" title="Large integer — original precision preserved">n</span>
         )}
@@ -166,7 +189,9 @@ export function JsonNode({
       >
         <span class="json-node__arrow">{expanded ? "▼" : "▶"}</span>
         {keyName !== null && (
-          <span class="json-node__key">{keyName}: </span>
+          <Copyable text={keyName} class="json-node__key" title={`Copy key "${keyName}"`}>
+            {keyName}:{" "}
+          </Copyable>
         )}
         {!expanded && (
           <span class="json-node__summary">
@@ -174,6 +199,13 @@ export function JsonNode({
           </span>
         )}
         {expanded && <span class="json-node__bracket">{bracket[0]}</span>}
+        <span
+          class={`json-node__copy-subtree ${subtreeCopied ? "json-node__copy-subtree--copied" : ""}`}
+          onClick={handleCopySubtree}
+          title={subtreeCopied ? "Copied!" : "Copy as JSON"}
+        >
+          {subtreeCopied ? "\u2713" : "\u2398"}
+        </span>
       </div>
       {expanded && (
         <>

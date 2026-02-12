@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import type { CapturedRequest } from "../types";
 import { formatSize } from "../lib/json-utils";
+import { Copyable } from "./copyable";
 
 interface DetailHeaderProps {
   request: CapturedRequest;
@@ -35,17 +36,21 @@ export function DetailHeader({ request }: DetailHeaderProps) {
           {showHeaders ? "Hide Headers" : "Headers"}
         </button>
       </div>
-      <div class="detail-header__url" title={request.url}>
+      <Copyable text={request.url} class="detail-header__url" title="Click to copy URL">
         {request.url}
-      </div>
+      </Copyable>
       {showHeaders && (
         <div class="detail-header__headers">
           <div class="detail-header__section">
             <div class="detail-header__section-title">Request Headers</div>
             {request.requestHeaders.map((h) => (
               <div class="detail-header__row" key={h.name}>
-                <span class="detail-header__name">{h.name}:</span>{" "}
-                <span class="detail-header__value">{h.value}</span>
+                <Copyable text={h.name} class="detail-header__name" title={`Copy "${h.name}"`}>
+                  {h.name}:
+                </Copyable>{" "}
+                <Copyable text={h.value || ""} class="detail-header__value" title="Click to copy value">
+                  {h.value}
+                </Copyable>
               </div>
             ))}
           </div>
@@ -53,8 +58,12 @@ export function DetailHeader({ request }: DetailHeaderProps) {
             <div class="detail-header__section-title">Response Headers</div>
             {request.responseHeaders.map((h) => (
               <div class="detail-header__row" key={h.name}>
-                <span class="detail-header__name">{h.name}:</span>{" "}
-                <span class="detail-header__value">{h.value}</span>
+                <Copyable text={h.name} class="detail-header__name" title={`Copy "${h.name}"`}>
+                  {h.name}:
+                </Copyable>{" "}
+                <Copyable text={h.value || ""} class="detail-header__value" title="Click to copy value">
+                  {h.value}
+                </Copyable>
               </div>
             ))}
           </div>
