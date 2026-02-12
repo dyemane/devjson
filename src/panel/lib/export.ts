@@ -24,6 +24,7 @@ export function exportAsJson(requests: CapturedRequest[]) {
     size: r.size,
     time: r.time,
     timestamp: r.timestamp,
+    timings: r.timings,
     requestHeaders: r.requestHeaders,
     responseHeaders: r.responseHeaders,
     body: r.parsed,
@@ -68,11 +69,21 @@ export function exportAsHar(requests: CapturedRequest[]) {
       bodySize: r.size,
     },
     cache: {},
-    timings: {
-      send: 0,
-      wait: r.time,
-      receive: 0,
-    },
+    timings: r.timings
+      ? {
+          blocked: Math.max(r.timings.blocked, 0),
+          dns: Math.max(r.timings.dns, 0),
+          connect: Math.max(r.timings.connect, 0),
+          ssl: Math.max(r.timings.ssl, 0),
+          send: Math.max(r.timings.send, 0),
+          wait: Math.max(r.timings.wait, 0),
+          receive: Math.max(r.timings.receive, 0),
+        }
+      : {
+          send: 0,
+          wait: r.time,
+          receive: 0,
+        },
   }));
 
   const har = {

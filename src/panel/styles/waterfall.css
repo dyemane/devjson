@@ -1,0 +1,122 @@
+/* Waterfall mini bar (sidebar) */
+.wf-bar {
+  display: inline-flex;
+  width: 40px;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.wf-bar__segment {
+  height: 100%;
+  min-width: 1px;
+}
+
+.request-item__timing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 80px;
+  justify-content: flex-end;
+}
+
+/* Waterfall tooltip */
+.wf-tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.wf-tooltip__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wf-tooltip__swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.wf-tooltip__label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  min-width: 48px;
+}
+
+.wf-tooltip__value {
+  font-size: 10px;
+  color: var(--text-primary);
+  text-align: right;
+  min-width: 48px;
+}
+
+.wf-tooltip__divider {
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
+}
+
+/* Timing breakdown (detail header) */
+.timing-breakdown {
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+}
+
+.timing-breakdown__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.timing-breakdown__label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  width: 56px;
+  flex-shrink: 0;
+}
+
+.timing-breakdown__bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.timing-breakdown__bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  min-width: 2px;
+}
+
+.timing-breakdown__value {
+  font-size: 10px;
+  color: var(--text-primary);
+  width: 48px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.timing-breakdown__total {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 0;
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.timing-breakdown__total .timing-breakdown__label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.timing-breakdown__total .timing-breakdown__value {
+  font-weight: 600;
+}

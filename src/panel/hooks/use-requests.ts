@@ -68,6 +68,7 @@ export function useRequests() {
         size: body.length,
         time: 0,
         timestamp: Date.now(),
+        timings: null,
         requestHeaders: [],
         responseHeaders: [],
         body,

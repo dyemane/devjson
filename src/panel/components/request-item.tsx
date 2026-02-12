@@ -3,6 +3,7 @@ import type { CapturedRequest } from "../types";
 import { truncateUrl, formatSize } from "../lib/json-utils";
 import { copyToClipboard } from "../lib/clipboard";
 import { Tooltip } from "./tooltip";
+import { WaterfallBar, WaterfallTooltip } from "./waterfall-bar";
 
 interface RequestItemProps {
   request: CapturedRequest;
@@ -82,7 +83,14 @@ export function RequestItem({ request, isSelected, isDiffBase, isPinned, onClick
       <span class={`request-item__status ${statusClass(request.status)}`}>
         {request.status}
       </span>
-      <span class="request-item__time">{Math.round(request.time)}ms</span>
+      {request.timings ? (
+        <Tooltip content={<WaterfallTooltip timings={request.timings} />} class="request-item__timing" delay={300}>
+          <WaterfallBar timings={request.timings} />
+          <span class="request-item__time">{Math.round(request.time)}ms</span>
+        </Tooltip>
+      ) : (
+        <span class="request-item__time">{Math.round(request.time)}ms</span>
+      )}
       <span class="request-item__size">{formatSize(request.size)}</span>
     </div>
   );

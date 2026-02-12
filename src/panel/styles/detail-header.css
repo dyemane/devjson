@@ -38,7 +38,6 @@
 }
 
 .detail-header__toggle {
-  margin-left: auto;
   background: var(--bg-tertiary);
   color: var(--text-secondary);
   border: 1px solid var(--border);
@@ -47,6 +46,10 @@
   font-family: var(--font-mono);
   font-size: 10px;
   cursor: pointer;
+}
+
+.detail-header__toggle--right {
+  margin-left: auto;
 }
 
 .detail-header__toggle:hover {

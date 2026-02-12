@@ -20,6 +20,7 @@ import "./styles/request-list.css";
 import "./styles/json-tree.css";
 import "./styles/detail-header.css";
 import "./styles/diff-viewer.css";
+import "./styles/waterfall.css";
 
 export function App() {
   const { requests, selected, selectedId, setSelectedId, clear, addImported, pinnedIds, togglePin, clearPins } =

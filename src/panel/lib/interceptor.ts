@@ -1,4 +1,4 @@
-import type { CapturedRequest } from "../types";
+import type { CapturedRequest, RequestTimings } from "../types";
 import { JSON_MIME_TYPES } from "../../shared/constants";
 import { isNdjsonMime, tryParseNdjson } from "./ndjson";
 import { safeJsonParse } from "./safe-json";
@@ -19,6 +19,19 @@ export function startIntercepting(
       if (!isJsonMime(mime)) return;
 
       const id = `req-${++requestId}`;
+      let timings: RequestTimings | null = null;
+      const t = (entry as any).timings;
+      if (t) {
+        timings = {
+          blocked: t.blocked ?? -1,
+          dns: t.dns ?? -1,
+          connect: t.connect ?? -1,
+          ssl: t.ssl ?? -1,
+          send: t.send ?? -1,
+          wait: t.wait ?? -1,
+          receive: t.receive ?? -1,
+        };
+      }
       const base: Omit<CapturedRequest, "body" | "parsed" | "error"> = {
         id,
         url: entry.request.url,
@@ -29,6 +42,7 @@ export function startIntercepting(
         size: entry.response.content.size,
         time: entry.time ?? 0,
         timestamp: Date.now(),
+        timings,
         requestHeaders: entry.request.headers.map((h) => ({
           name: h.name,
           value: h.value,

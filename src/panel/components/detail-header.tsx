@@ -2,6 +2,7 @@ import { useState } from "preact/hooks";
 import type { CapturedRequest } from "../types";
 import { formatSize } from "../lib/json-utils";
 import { Copyable } from "./copyable";
+import { TimingBreakdown } from "./timing-breakdown";
 
 interface DetailHeaderProps {
   request: CapturedRequest;
@@ -35,6 +36,7 @@ function headerTip(name: string, value: string) {
 
 export function DetailHeader({ request }: DetailHeaderProps) {
   const [showHeaders, setShowHeaders] = useState(false);
+  const [showTiming, setShowTiming] = useState(false);
 
   return (
     <div class="detail-header">
@@ -52,13 +54,24 @@ export function DetailHeader({ request }: DetailHeaderProps) {
         <span class="detail-header__meta">
           {formatSize(request.size)}
         </span>
+        {request.timings && (
+          <button
+            class="detail-header__toggle detail-header__toggle--right"
+            onClick={() => setShowTiming(!showTiming)}
+          >
+            {showTiming ? "Hide Timing" : "Timing"}
+          </button>
+        )}
         <button
-          class="detail-header__toggle"
+          class={`detail-header__toggle${request.timings ? "" : " detail-header__toggle--right"}`}
           onClick={() => setShowHeaders(!showHeaders)}
         >
           {showHeaders ? "Hide Headers" : "Headers"}
         </button>
       </div>
+      {showTiming && request.timings && (
+        <TimingBreakdown timings={request.timings} />
+      )}
       {showHeaders && (
         <div class="detail-header__headers">
           <div class="detail-header__section">

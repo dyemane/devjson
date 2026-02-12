@@ -3,6 +3,16 @@ export interface HeaderEntry {
   value: string;
 }
 
+export interface RequestTimings {
+  blocked: number;
+  dns: number;
+  connect: number;
+  ssl: number;
+  send: number;
+  wait: number;
+  receive: number;
+}
+
 export interface CapturedRequest {
   id: string;
   url: string;
@@ -13,6 +23,7 @@ export interface CapturedRequest {
   size: number;
   time: number;
   timestamp: number;
+  timings: RequestTimings | null;
   requestHeaders: HeaderEntry[];
   responseHeaders: HeaderEntry[];
   body: string | null;
