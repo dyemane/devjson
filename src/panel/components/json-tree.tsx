@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "preact/hooks";
 import { JsonNode } from "./json-node";
+import { JsonPathBar } from "./jsonpath-bar";
 import { copyToClipboard } from "../lib/clipboard";
 import { countNodes } from "../lib/json-utils";
 
@@ -7,6 +8,19 @@ interface JsonTreeProps {
   data: unknown;
   matchPaths: Set<string>;
   activePath: string | null;
+  jpMatchPaths: Set<string>;
+  jpActivePath: string | null;
+  showJpBar: boolean;
+  jpQuery: string;
+  jpMatchCount: number;
+  jpActiveIndex: number;
+  jpError: string | null;
+  onJpQuery: (q: string) => void;
+  onJpNext: () => void;
+  onJpPrev: () => void;
+  onJpToggle: () => void;
+  onJpClose: () => void;
+  jpInputRef?: { current: HTMLInputElement | null };
 }
 
 function toJsonPath(path: string): string {
@@ -15,7 +29,24 @@ function toJsonPath(path: string): string {
   return "$." + path;
 }
 
-export function JsonTree({ data, matchPaths, activePath }: JsonTreeProps) {
+export function JsonTree({
+  data,
+  matchPaths,
+  activePath,
+  jpMatchPaths,
+  jpActivePath,
+  showJpBar,
+  jpQuery,
+  jpMatchCount,
+  jpActiveIndex,
+  jpError,
+  onJpQuery,
+  onJpNext,
+  onJpPrev,
+  onJpToggle,
+  onJpClose,
+  jpInputRef,
+}: JsonTreeProps) {
   // Positive number = expand all, negative = collapse all, 0 = default
   const [expandGeneration, setExpandGeneration] = useState(0);
   const [hoveredPath, setHoveredPath] = useState<string | null>(null);
@@ -58,10 +89,30 @@ export function JsonTree({ data, matchPaths, activePath }: JsonTreeProps) {
         <button class="json-tree__btn" onClick={collapseAll}>
           Collapse All
         </button>
+        <button
+          class={`json-tree__btn ${showJpBar ? "json-tree__btn--active" : ""}`}
+          onClick={onJpToggle}
+          title="Toggle JSONPath query (p)"
+        >
+          $.
+        </button>
         {nodeCount > 100 && (
           <span class="json-tree__node-count">{nodeCount.toLocaleString()} nodes</span>
         )}
       </div>
+      {showJpBar && (
+        <JsonPathBar
+          query={jpQuery}
+          matchCount={jpMatchCount}
+          activeIndex={jpActiveIndex}
+          error={jpError}
+          onQuery={onJpQuery}
+          onNext={onJpNext}
+          onPrev={onJpPrev}
+          onClose={onJpClose}
+          inputRef={jpInputRef}
+        />
+      )}
       <div class="json-tree__body">
         <JsonNode
           keyName={null}
@@ -70,6 +121,8 @@ export function JsonTree({ data, matchPaths, activePath }: JsonTreeProps) {
           path=""
           matchPaths={matchPaths}
           activePath={activePath}
+          jpMatchPaths={jpMatchPaths}
+          jpActivePath={jpActivePath}
           expandGeneration={expandGeneration}
           onHoverPath={handleHoverPath}
         />

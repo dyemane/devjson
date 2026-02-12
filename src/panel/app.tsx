@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { useRequests } from "./hooks/use-requests";
 import { useJsonSearch } from "./hooks/use-json-search";
+import { useJsonPath } from "./hooks/use-jsonpath";
 import { useResize } from "./hooks/use-resize";
 import { useTheme } from "./hooks/use-theme";
 import { Toolbar } from "./components/toolbar";
@@ -25,6 +26,10 @@ export function App() {
     useRequests();
   const { query, setQuery, matches, matchPaths, activeIndex, activePath, next, prev } =
     useJsonSearch(selected?.parsed ?? null);
+  const {
+    jpQuery, setJpQuery, jpMatches, jpMatchPaths, jpActiveIndex, jpActivePath,
+    jpError, jpNext, jpPrev,
+  } = useJsonPath(selected?.parsed ?? null);
   const { size: sidebarWidth, onMouseDown: onSidebarResize } = useResize(340);
   const { size: detailHeaderHeight, onMouseDown: onDetailResize } = useResize(
     120,
@@ -41,6 +46,8 @@ export function App() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [diffBase, setDiffBase] = useState<CapturedRequest | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [showJpBar, setShowJpBar] = useState(false);
+  const jpInputRef = useRef<HTMLInputElement>(null);
 
   const handleFilterInput = useCallback((e: Event) => {
     const value = (e.target as HTMLInputElement).value;
@@ -113,6 +120,21 @@ export function App() {
         return;
       }
 
+      // p — toggle JSONPath bar
+      if (e.key === "p") {
+        if (selected) {
+          e.preventDefault();
+          setShowJpBar((v) => {
+            const next = !v;
+            if (next) {
+              setTimeout(() => jpInputRef.current?.focus(), 0);
+            }
+            return next;
+          });
+        }
+        return;
+      }
+
       // j / ArrowDown — next request
       if (e.key === "j" || (e.key === "ArrowDown" && !isInput)) {
         e.preventDefault();
@@ -153,6 +175,10 @@ export function App() {
         e.preventDefault();
         if (query) {
           setQuery("");
+        } else if (jpQuery) {
+          setJpQuery("");
+        } else if (showJpBar) {
+          setShowJpBar(false);
         } else {
           closeDetail();
         }
@@ -162,7 +188,7 @@ export function App() {
 
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [filteredRequests, selectedId, selected, query, showHelp, next, prev]);
+  }, [filteredRequests, selectedId, selected, query, jpQuery, showJpBar, showHelp, next, prev]);
 
   return (
     <div class="app">
@@ -255,7 +281,35 @@ export function App() {
                 Parse error: {selected.error}
               </div>
             ) : (
-              <JsonTree data={selected.parsed} matchPaths={matchPaths} activePath={activePath} />
+              <JsonTree
+                data={selected.parsed}
+                matchPaths={matchPaths}
+                activePath={activePath}
+                jpMatchPaths={jpMatchPaths}
+                jpActivePath={jpActivePath}
+                showJpBar={showJpBar}
+                jpQuery={jpQuery}
+                jpMatchCount={jpMatches.length}
+                jpActiveIndex={jpActiveIndex}
+                jpError={jpError}
+                onJpQuery={setJpQuery}
+                onJpNext={jpNext}
+                onJpPrev={jpPrev}
+                onJpToggle={() => {
+                  setShowJpBar((v) => {
+                    const next = !v;
+                    if (next) {
+                      setTimeout(() => jpInputRef.current?.focus(), 0);
+                    }
+                    return next;
+                  });
+                }}
+                onJpClose={() => {
+                  setJpQuery("");
+                  setShowJpBar(false);
+                }}
+                jpInputRef={jpInputRef}
+              />
             )}
           </div>
         ) : diffBase && !selected ? (

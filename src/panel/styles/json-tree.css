@@ -34,6 +34,11 @@
   background: var(--bg-hover);
 }
 
+.json-tree__btn--active {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
 .json-tree__node-count {
   color: var(--text-muted);
   font-size: 10px;
@@ -90,6 +95,100 @@
   background: #6f4b1a;
   border-radius: 2px;
   outline: 1px solid #c4842d;
+}
+
+.json-node--jp-match {
+  background: var(--bg-jp-match);
+  border-radius: 2px;
+}
+
+.json-node--jp-active {
+  background: var(--bg-jp-active);
+  border-radius: 2px;
+  outline: 1px solid #4a9edd;
+}
+
+/* --- JSONPath bar --- */
+
+.jp-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+.jp-bar--error .jp-bar__input {
+  border-color: var(--status-error);
+}
+
+.jp-bar__label {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.jp-bar__input {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  outline: none;
+}
+
+.jp-bar__input:focus {
+  border-color: var(--accent);
+}
+
+.jp-bar__clear,
+.jp-bar__close,
+.jp-bar__nav {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 4px;
+  line-height: 1;
+}
+
+.jp-bar__clear:hover,
+.jp-bar__close:hover,
+.jp-bar__nav:hover {
+  color: var(--text-primary);
+}
+
+.jp-bar__count {
+  color: var(--text-secondary);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.jp-bar__count--none {
+  color: var(--status-warn);
+}
+
+.jp-bar__badge {
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.jp-bar__badge--error {
+  color: var(--status-error);
+  background: rgba(241, 76, 76, 0.15);
+  border: 1px solid rgba(241, 76, 76, 0.3);
 }
 
 .json-node__toggle {

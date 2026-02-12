@@ -13,6 +13,7 @@
     "package": "npm run build && cd dist && zip -r ../devjson-1.0.0.zip . && cd .. && echo 'Packaged: devjson-1.0.0.zip'"
   },
   "dependencies": {
+    "jsonpath-plus": "^10.3.0",
     "preact": "^10.25.0"
   },
   "devDependencies": {

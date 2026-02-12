@@ -14,6 +14,8 @@ interface JsonNodeProps {
   path: string;
   matchPaths: Set<string>;
   activePath: string | null;
+  jpMatchPaths: Set<string>;
+  jpActivePath: string | null;
   expandGeneration: number;
   onHoverPath: (path: string | null) => void;
 }
@@ -75,13 +77,17 @@ export function JsonNode({
   path,
   matchPaths,
   activePath,
+  jpMatchPaths,
+  jpActivePath,
   expandGeneration,
   onHoverPath,
 }: JsonNodeProps) {
   const isExpandable = value !== null && typeof value === "object";
   const isMatch = matchPaths.has(path);
   const isActive = activePath === path;
-  const shouldAutoExpand = isAncestorOfActive(path, activePath);
+  const isJpMatch = jpMatchPaths.has(path);
+  const isJpActive = jpActivePath === path;
+  const shouldAutoExpand = isAncestorOfActive(path, activePath) || isAncestorOfActive(path, jpActivePath);
   const [expanded, setExpanded] = useState(depth < AUTO_EXPAND_DEPTH);
   const [visibleCount, setVisibleCount] = useState(CHUNK_SIZE);
   const [subtreeCopied, setSubtreeCopied] = useState(false);
@@ -106,16 +112,17 @@ export function JsonNode({
     }
   }, [shouldAutoExpand]);
 
-  // Scroll active match into view
+  // Scroll active match into view (search or JSONPath)
   useEffect(() => {
-    if (isActive && nodeRef.current) {
+    if ((isActive || isJpActive) && nodeRef.current) {
       nodeRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
-  }, [isActive]);
+  }, [isActive, isJpActive]);
 
   // If active match is beyond visible chunk, expand the visible range
   useEffect(() => {
-    if (!activePath || !expanded || !isExpandable) return;
+    const target = activePath || jpActivePath;
+    if (!target || !expanded || !isExpandable) return;
     const entries = Array.isArray(value)
       ? (value as unknown[])
       : Object.entries(value as Record<string, unknown>);
@@ -127,18 +134,23 @@ export function JsonNode({
       const childPath = Array.isArray(value)
         ? `${path}[${k}]`
         : path ? `${path}.${k}` : k;
-      if (activePath === childPath || activePath.startsWith(childPath + ".") || activePath.startsWith(childPath + "[")) {
+      if (target === childPath || target.startsWith(childPath + ".") || target.startsWith(childPath + "[")) {
         setVisibleCount(Math.min(i + CHUNK_SIZE, total));
         break;
       }
     }
-  }, [activePath, expanded, visibleCount]);
+  }, [activePath, jpActivePath, expanded, visibleCount]);
 
-  const matchClass = isActive
-    ? "json-node--active"
-    : isMatch
-      ? "json-node--match"
-      : "";
+  // JSONPath highlight takes visual priority over text search
+  const matchClass = isJpActive
+    ? "json-node--jp-active"
+    : isActive
+      ? "json-node--active"
+      : isJpMatch
+        ? "json-node--jp-match"
+        : isMatch
+          ? "json-node--match"
+          : "";
 
   const handleMouseEnter = () => {
     if (path) onHoverPath(path);
@@ -155,7 +167,7 @@ export function JsonNode({
   if (!isExpandable) {
     return (
       <div
-        ref={isActive ? nodeRef : undefined}
+        ref={isActive || isJpActive ? nodeRef : undefined}
         class={`json-node ${matchClass}`}
         style={{ paddingLeft: `${depth * 16}px` }}
         onMouseEnter={handleMouseEnter}
@@ -207,7 +219,7 @@ export function JsonNode({
   return (
     <div class={`json-node ${matchClass}`}>
       <div
-        ref={isActive ? nodeRef : undefined}
+        ref={isActive || isJpActive ? nodeRef : undefined}
         class="json-node__toggle"
         style={{ paddingLeft: `${depth * 16}px` }}
         onClick={() => {
@@ -256,6 +268,8 @@ export function JsonNode({
                 path={childPath}
                 matchPaths={matchPaths}
                 activePath={activePath}
+                jpMatchPaths={jpMatchPaths}
+                jpActivePath={jpActivePath}
                 expandGeneration={expandGeneration}
                 onHoverPath={onHoverPath}
               />
