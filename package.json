@@ -1,0 +1,25 @@
+{
+  "name": "devjson",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Developer Request Inspector — DevTools panel that intercepts, formats, searches, and copies JSON API responses",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "lint": "biome check src/",
+    "lint:fix": "biome check --fix src/"
+  },
+  "dependencies": {
+    "preact": "^10.25.0"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.0",
+    "@types/chrome": "^0.0.287",
+    "typescript": "^5.7.0",
+    "vite": "^6.1.0",
+    "vitest": "^3.0.0",
+    "@biomejs/biome": "^1.9.0"
+  }
+}
