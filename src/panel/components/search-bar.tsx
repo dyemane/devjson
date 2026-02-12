@@ -5,9 +5,10 @@ interface SearchBarProps {
   query: string;
   matchCount: number;
   onSearch: (query: string) => void;
+  onClose: () => void;
 }
 
-export function SearchBar({ query, matchCount, onSearch }: SearchBarProps) {
+export function SearchBar({ query, matchCount, onSearch, onClose }: SearchBarProps) {
   const timer = useRef<ReturnType<typeof setTimeout>>();
 
   const handleInput = useCallback(
@@ -32,6 +33,9 @@ export function SearchBar({ query, matchCount, onSearch }: SearchBarProps) {
           {matchCount} match{matchCount !== 1 ? "es" : ""}
         </span>
       )}
+      <button class="search-bar__close" onClick={onClose} title="Close panel">
+        ✕
+      </button>
     </div>
   );
 }

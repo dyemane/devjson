@@ -22,10 +22,19 @@ export function startIntercepting(
         url: entry.request.url,
         method: entry.request.method,
         status: entry.response.status,
+        statusText: entry.response.statusText,
         mimeType: mime,
         size: entry.response.content.size,
         time: entry.time ?? 0,
         timestamp: Date.now(),
+        requestHeaders: entry.request.headers.map((h) => ({
+          name: h.name,
+          value: h.value,
+        })),
+        responseHeaders: entry.response.headers.map((h) => ({
+          name: h.name,
+          value: h.value,
+        })),
       };
 
       entry.getContent((body) => {

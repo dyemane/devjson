@@ -12,9 +12,9 @@ interface ToolbarProps {
 export function Toolbar({ count, selected, onClear }: ToolbarProps) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
+  const handleCopy = () => {
     if (!selected?.parsed) return;
-    const ok = await copyToClipboard(formatJson(selected.parsed));
+    const ok = copyToClipboard(formatJson(selected.parsed));
     if (ok) {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
