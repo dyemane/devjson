@@ -16,22 +16,17 @@ Prioritized by competitive gaps (what users of JSON Viewer Pro / tulios/json-vie
 - [x] Closable detail pane
 - [x] Zero permissions (pure DevTools panel)
 - [x] Custom icon
-
-## In Progress
-
-- [ ] Search next/prev navigation with keyboard shortcuts
+- [x] Search next/prev navigation with keyboard shortcuts (Enter/Shift+Enter, ▲▼ buttons, "3 of 27" counter)
+- [x] JSON path display (hover shows `$.path.to.key`, click to copy)
+- [x] Expand/collapse all toggle
+- [x] Filter requests by URL pattern (debounced, case-insensitive)
+- [x] Search clear button (✕) with Escape key support
+- [x] JSON diff — compare two captured responses (set base, select another to diff)
 
 ## Up Next
 
 ### High Impact (competitive gaps + most requested)
-- [ ] Search next/prev with up/down arrows and match counter (e.g. "3 of 27")
-- [ ] JSON path display (show path to selected node, click to copy)
-- [ ] Expand/collapse all toggle
-- [ ] Filter requests by URL pattern
 - [ ] Large JSON virtualization (perf for 10k+ node responses)
-
-### Medium Impact (differentiation)
-- [ ] JSON diff — compare two captured responses side by side
 - [ ] BigInt / numeric precision handling (avoid JS float issues)
 - [ ] JSON Lines (NDJSON) format support
 - [ ] Paste/import JSON from clipboard

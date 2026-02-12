@@ -8,12 +8,15 @@ import { DetailHeader } from "./components/detail-header";
 import { JsonTree } from "./components/json-tree";
 import { SearchBar } from "./components/search-bar";
 import { EmptyState } from "./components/empty-state";
+import { DiffViewer } from "./components/diff-viewer";
 import { SEARCH_DEBOUNCE_MS } from "../shared/constants";
+import type { CapturedRequest } from "./types";
 import "./styles/panel.css";
 import "./styles/toolbar.css";
 import "./styles/request-list.css";
 import "./styles/json-tree.css";
 import "./styles/detail-header.css";
+import "./styles/diff-viewer.css";
 
 export function App() {
   const { requests, selected, selectedId, setSelectedId, clear } =
@@ -30,11 +33,19 @@ export function App() {
 
   const [urlFilter, setUrlFilter] = useState("");
   const filterTimer = useRef<ReturnType<typeof setTimeout>>();
+  const filterInputRef = useRef<HTMLInputElement>(null);
+  const [diffBase, setDiffBase] = useState<CapturedRequest | null>(null);
 
   const handleFilterInput = useCallback((e: Event) => {
     const value = (e.target as HTMLInputElement).value;
     clearTimeout(filterTimer.current);
     filterTimer.current = setTimeout(() => setUrlFilter(value), SEARCH_DEBOUNCE_MS);
+  }, []);
+
+  const clearFilter = useCallback(() => {
+    if (filterInputRef.current) filterInputRef.current.value = "";
+    clearTimeout(filterTimer.current);
+    setUrlFilter("");
   }, []);
 
   const filteredRequests = useMemo(() => {
@@ -48,13 +59,36 @@ export function App() {
 
   const closeDetail = () => setSelectedId(null);
 
+  const handleSetDiffBase = () => {
+    if (selected) {
+      setDiffBase(selected);
+      setSelectedId(null);
+    }
+  };
+
+  const handleClearDiff = () => {
+    setDiffBase(null);
+  };
+
+  // In diff mode, selecting a request shows the diff
+  const showDiff = diffBase && selected && diffBase.id !== selected.id;
+
   return (
     <div class="app">
-      <Toolbar count={requests.length} selected={selected} onClear={clear} />
+      <Toolbar
+        count={requests.length}
+        selected={selected}
+        diffBase={diffBase}
+        onClear={clear}
+        onSetDiffBase={handleSetDiffBase}
+        onClearDiff={handleClearDiff}
+      />
       <div class="app__body">
         <div class="app__sidebar" style={{ width: `${sidebarWidth}px` }}>
           <div class="sidebar-header">
-            <span class="sidebar-header__title">Requests</span>
+            <span class="sidebar-header__title">
+              {diffBase ? "Select to compare" : "Requests"}
+            </span>
             <span class="sidebar-header__count">
               {urlFilter
                 ? `${filteredRequests.length}/${requests.length}`
@@ -65,11 +99,17 @@ export function App() {
           </div>
           <div class="sidebar-filter">
             <input
+              ref={filterInputRef}
               class="sidebar-filter__input"
               type="text"
               placeholder="Filter by URL or method…"
               onInput={handleFilterInput}
             />
+            {urlFilter && (
+              <button class="sidebar-filter__clear" onClick={clearFilter} title="Clear filter">
+                ✕
+              </button>
+            )}
           </div>
           <div class="sidebar-body">
             {filteredRequests.length === 0 ? (
@@ -79,12 +119,19 @@ export function App() {
                 requests={filteredRequests}
                 selectedId={selectedId}
                 onSelect={setSelectedId}
+                diffBaseId={diffBase?.id ?? null}
               />
             )}
           </div>
         </div>
         <div class="app__resize-handle" onMouseDown={onSidebarResize} />
-        {selected && (
+        {showDiff ? (
+          <DiffViewer
+            base={diffBase}
+            compare={selected}
+            onClose={handleClearDiff}
+          />
+        ) : selected && !diffBase ? (
           <div class="app__detail">
             <SearchBar
               query={query}
@@ -112,6 +159,14 @@ export function App() {
             ) : (
               <JsonTree data={selected.parsed} matchPaths={matchPaths} activePath={activePath} />
             )}
+          </div>
+        ) : diffBase && !selected ? (
+          <div class="app__no-selection">
+            Select a request to compare with base
+          </div>
+        ) : (
+          <div class="app__no-selection">
+            {requests.length > 0 ? "Select a request to view JSON" : ""}
           </div>
         )}
       </div>

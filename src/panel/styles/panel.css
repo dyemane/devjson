@@ -86,10 +86,31 @@ body,
 }
 
 .sidebar-filter {
+  position: relative;
   padding: 4px 6px;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+}
+
+.sidebar-filter__clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 3px;
+}
+
+.sidebar-filter__clear:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
 }
 
 .sidebar-filter__input {

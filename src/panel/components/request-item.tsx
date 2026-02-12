@@ -4,6 +4,7 @@ import { truncateUrl, formatSize } from "../lib/json-utils";
 interface RequestItemProps {
   request: CapturedRequest;
   isSelected: boolean;
+  isDiffBase: boolean;
   onClick: () => void;
 }
 
@@ -13,12 +14,14 @@ function statusClass(status: number): string {
   return "request-item__status--ok";
 }
 
-export function RequestItem({ request, isSelected, onClick }: RequestItemProps) {
+export function RequestItem({ request, isSelected, isDiffBase, onClick }: RequestItemProps) {
+  let cls = "request-item";
+  if (isSelected) cls += " request-item--selected";
+  if (isDiffBase) cls += " request-item--diff-base";
+
   return (
-    <div
-      class={`request-item ${isSelected ? "request-item--selected" : ""}`}
-      onClick={onClick}
-    >
+    <div class={cls} onClick={onClick}>
+      {isDiffBase && <span class="request-item__badge">BASE</span>}
       <span class="request-item__method">{request.method}</span>
       <span class="request-item__url" title={request.url}>
         {truncateUrl(request.url)}

@@ -21,6 +21,7 @@ export function SearchBar({
   onClose,
 }: SearchBarProps) {
   const timer = useRef<ReturnType<typeof setTimeout>>();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleInput = useCallback(
     (e: Event) => {
@@ -30,6 +31,12 @@ export function SearchBar({
     },
     [onSearch],
   );
+
+  const handleClear = useCallback(() => {
+    if (inputRef.current) inputRef.current.value = "";
+    clearTimeout(timer.current);
+    onSearch("");
+  }, [onSearch]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -42,21 +49,31 @@ export function SearchBar({
         }
       }
       if (e.key === "Escape") {
-        onClose();
+        if (query) {
+          handleClear();
+        } else {
+          onClose();
+        }
       }
     },
-    [onNext, onPrev, onClose],
+    [onNext, onPrev, onClose, query, handleClear],
   );
 
   return (
     <div class="search-bar">
       <input
+        ref={inputRef}
         class="search-bar__input"
         type="text"
         placeholder="Search keys and values…"
         onInput={handleInput}
         onKeyDown={handleKeyDown}
       />
+      {query && (
+        <button class="search-bar__clear" onClick={handleClear} title="Clear search">
+          ✕
+        </button>
+      )}
       {query && matchCount > 0 && (
         <>
           <span class="search-bar__count">

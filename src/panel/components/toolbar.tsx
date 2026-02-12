@@ -6,10 +6,20 @@ import type { CapturedRequest } from "../types";
 interface ToolbarProps {
   count: number;
   selected: CapturedRequest | null;
+  diffBase: CapturedRequest | null;
   onClear: () => void;
+  onSetDiffBase: () => void;
+  onClearDiff: () => void;
 }
 
-export function Toolbar({ count, selected, onClear }: ToolbarProps) {
+export function Toolbar({
+  count,
+  selected,
+  diffBase,
+  onClear,
+  onSetDiffBase,
+  onClearDiff,
+}: ToolbarProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -32,6 +42,16 @@ export function Toolbar({ count, selected, onClear }: ToolbarProps) {
         </span>
       </div>
       <div class="toolbar__right">
+        {diffBase && (
+          <button class="toolbar__btn toolbar__btn--active" onClick={onClearDiff}>
+            Exit Diff
+          </button>
+        )}
+        {selected?.parsed != null && !diffBase && (
+          <button class="toolbar__btn" onClick={onSetDiffBase} title="Set as diff base, then select another request to compare">
+            Diff Base
+          </button>
+        )}
         {selected?.parsed != null && (
           <button class="toolbar__btn" onClick={handleCopy}>
             {copied ? "Copied!" : "Copy JSON"}

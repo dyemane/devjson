@@ -71,3 +71,22 @@
   min-width: 48px;
   text-align: right;
 }
+
+.request-item--diff-base {
+  background: rgba(241, 76, 76, 0.08);
+  border-left: 2px solid var(--status-error);
+}
+
+.request-item--diff-base:hover {
+  background: rgba(241, 76, 76, 0.14);
+}
+
+.request-item__badge {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--status-error);
+  background: rgba(241, 76, 76, 0.15);
+  padding: 1px 4px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+}

@@ -31,6 +31,17 @@
   background: var(--bg-hover);
 }
 
+.toolbar__btn--active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.toolbar__btn--active:hover {
+  opacity: 0.9;
+  background: var(--accent);
+}
+
 .toolbar__count {
   color: var(--text-secondary);
   font-size: 11px;
@@ -69,6 +80,22 @@
   color: var(--text-secondary);
   font-size: 11px;
   white-space: nowrap;
+}
+
+.search-bar__clear {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 3px;
+}
+
+.search-bar__clear:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
 }
 
 .search-bar__count--none {
