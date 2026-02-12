@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import type { CapturedRequest } from "../types";
 import { truncateUrl, formatSize } from "../lib/json-utils";
 import { copyToClipboard } from "../lib/clipboard";
+import { Tooltip } from "./tooltip";
 
 interface RequestItemProps {
   request: CapturedRequest;
@@ -38,20 +39,31 @@ export function RequestItem({ request, isSelected, isDiffBase, onClick }: Reques
   if (isSelected) cls += " request-item--selected";
   if (isDiffBase) cls += " request-item--diff-base";
 
+  const copyTip = urlCopied
+    ? <><span class="tip__icon">&#x2713;</span> Copied!</>
+    : (
+      <>
+        <span class="tip__preview tip__preview--wrap">{request.url}</span>
+        <span class="tip__meta">click to copy URL</span>
+      </>
+    );
+
   return (
     <div ref={itemRef} class={cls} onClick={onClick}>
       {isDiffBase && <span class="request-item__badge">BASE</span>}
       <span class="request-item__method">{request.method}</span>
-      <span class="request-item__url" title={request.url}>
+      <span class="request-item__url">
         {truncateUrl(request.url)}
       </span>
-      <span
+      <Tooltip
+        content={copyTip}
         class={`request-item__copy ${urlCopied ? "request-item__copy--copied" : ""}`}
-        onClick={handleCopyUrl}
-        title={urlCopied ? "Copied!" : "Copy URL"}
+        delay={300}
       >
-        {urlCopied ? "\u2713" : "\u2398"}
-      </span>
+        <span onClick={handleCopyUrl}>
+          {urlCopied ? "\u2713" : "\u2398"}
+        </span>
+      </Tooltip>
       <span class={`request-item__status ${statusClass(request.status)}`}>
         {request.status}
       </span>

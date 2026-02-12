@@ -42,11 +42,15 @@
 
 .request-item__copy {
   display: none;
-  font-size: 10px;
+  font-size: 18px;
+  line-height: 0;
+  vertical-align: middle;
   color: var(--text-muted);
-  cursor: copy;
+  cursor: pointer;
   padding: 0 2px;
   flex-shrink: 0;
+  background: none;
+  border: none;
 }
 
 .request-item:hover .request-item__copy {

@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "preact/hooks";
+import type { ComponentChildren } from "preact";
 import { AUTO_EXPAND_DEPTH, CHUNK_SIZE } from "../../shared/constants";
 import { copyToClipboard } from "../lib/clipboard";
-import { formatJson } from "../lib/json-utils";
+import { formatJson, countNodes } from "../lib/json-utils";
 import { isBigIntValue, unwrapBigInt } from "../lib/safe-json";
 import { Copyable } from "./copyable";
+import { Tooltip } from "./tooltip";
 
 interface JsonNodeProps {
   keyName: string | null;
@@ -40,6 +42,27 @@ function rawCopyValue(value: unknown): string {
   return String(value);
 }
 
+function typeTag(value: unknown): string {
+  if (value === null) return "null";
+  if (isBigIntValue(value)) return "bigint";
+  return typeof value;
+}
+
+function valueTip(value: unknown): ComponentChildren {
+  const raw = rawCopyValue(value);
+  const tag = typeTag(value);
+  const preview = raw.length > 60 ? raw.slice(0, 60) + "\u2026" : raw;
+  return (
+    <>
+      <span class="tip__preview">{preview}</span>
+      <span class="tip__meta">
+        {tag}{typeof value === "string" ? ` \u00b7 ${(value as string).length} chars` : ""}
+        {" \u00b7 click to copy"}
+      </span>
+    </>
+  );
+}
+
 function isAncestorOfActive(path: string, activePath: string | null): boolean {
   if (!activePath || !path) return false;
   return activePath.startsWith(path + ".") || activePath.startsWith(path + "[");
@@ -70,7 +93,6 @@ export function JsonNode({
     if (expandGeneration !== prevGeneration.current) {
       setExpanded(expandGeneration > 0);
       prevGeneration.current = expandGeneration;
-      // Reset visible count when collapsing all
       if (expandGeneration < 0) {
         setVisibleCount(CHUNK_SIZE);
       }
@@ -100,7 +122,6 @@ export function JsonNode({
     const total = Array.isArray(value) ? entries.length : (entries as [string, unknown][]).length;
     if (visibleCount >= total) return;
 
-    // Check if active path is in a child beyond visible range
     for (let i = visibleCount; i < total; i++) {
       const k = Array.isArray(value) ? String(i) : (entries as [string, unknown][])[i][0];
       const childPath = Array.isArray(value)
@@ -140,15 +161,19 @@ export function JsonNode({
         onMouseEnter={handleMouseEnter}
       >
         {keyName !== null && (
-          <Copyable text={keyName} class="json-node__key" title={`Copy key "${keyName}"`}>
+          <Copyable
+            text={keyName}
+            class="json-node__key"
+            tooltip={<span class="tip__meta">click to copy key</span>}
+          >
             {keyName}:{" "}
           </Copyable>
         )}
-        <Copyable text={rawCopyValue(value)} class={valueClass(value)} title="Click to copy value">
+        <Copyable text={rawCopyValue(value)} class={valueClass(value)} tooltip={valueTip(value)}>
           {renderValue(value)}
         </Copyable>
         {isBigIntValue(value) && (
-          <span class="json-node__bigint-badge" title="Large integer — original precision preserved">n</span>
+          <span class="json-node__bigint-badge">n</span>
         )}
       </div>
     );
@@ -174,6 +199,11 @@ export function JsonNode({
     setVisibleCount(totalEntries);
   };
 
+  const nodeCount = countNodes(value);
+  const subtreeTip = subtreeCopied
+    ? <><span class="tip__icon">&#x2713;</span> Copied!</>
+    : <span class="tip__meta">Copy {nodeCount.toLocaleString()} nodes as JSON</span>;
+
   return (
     <div class={`json-node ${matchClass}`}>
       <div
@@ -187,9 +217,13 @@ export function JsonNode({
         }}
         onMouseEnter={handleMouseEnter}
       >
-        <span class="json-node__arrow">{expanded ? "▼" : "▶"}</span>
+        <span class="json-node__arrow">{expanded ? "\u25bc" : "\u25b6"}</span>
         {keyName !== null && (
-          <Copyable text={keyName} class="json-node__key" title={`Copy key "${keyName}"`}>
+          <Copyable
+            text={keyName}
+            class="json-node__key"
+            tooltip={<span class="tip__meta">click to copy key</span>}
+          >
             {keyName}:{" "}
           </Copyable>
         )}
@@ -199,13 +233,15 @@ export function JsonNode({
           </span>
         )}
         {expanded && <span class="json-node__bracket">{bracket[0]}</span>}
-        <span
+        <Tooltip
+          content={subtreeTip}
           class={`json-node__copy-subtree ${subtreeCopied ? "json-node__copy-subtree--copied" : ""}`}
-          onClick={handleCopySubtree}
-          title={subtreeCopied ? "Copied!" : "Copy as JSON"}
+          delay={300}
         >
-          {subtreeCopied ? "\u2713" : "\u2398"}
-        </span>
+          <span onClick={handleCopySubtree}>
+            {subtreeCopied ? "\u2713" : "\u2398"}
+          </span>
+        </Tooltip>
       </div>
       {expanded && (
         <>

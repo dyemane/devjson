@@ -265,7 +265,7 @@ body,
 
 /* Copyable — shared click-to-copy affordance */
 .copyable {
-  cursor: copy;
+  cursor: pointer;
   border-radius: 2px;
   transition: background 0.15s;
 }
@@ -277,6 +277,65 @@ body,
 .copyable--copied {
   background: rgba(78, 201, 176, 0.2) !important;
   transition: background 0s;
+}
+
+/* Tooltip system */
+.tip-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  z-index: 200;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  line-height: 1.4;
+}
+
+.tip--success {
+  color: var(--status-ok);
+}
+
+.tip__icon {
+  margin-right: 2px;
+}
+
+.tip__preview {
+  display: block;
+  color: var(--text-primary);
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tip__preview--wrap {
+  white-space: normal;
+  word-break: break-all;
+}
+
+.tip__label {
+  display: block;
+  color: var(--text-muted);
+  font-size: 10px;
+  margin-bottom: 2px;
+}
+
+.tip__meta {
+  display: block;
+  color: var(--text-muted);
+  font-size: 10px;
 }
 
 .empty-state {

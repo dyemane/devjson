@@ -55,12 +55,13 @@
 }
 
 .detail-header__url {
-  padding: 0 10px 6px;
+  flex: 1;
   font-size: 11px;
   color: var(--text-primary);
-  word-break: break-all;
-  line-height: 1.4;
-  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .detail-header__headers {

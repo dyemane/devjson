@@ -163,12 +163,15 @@
 
 .json-node__copy-subtree {
   display: none;
-  margin-left: 8px;
-  font-size: 10px;
+  margin-left: 6px;
+  font-size: 18px;
+  line-height: 0;
+  vertical-align: middle;
   color: var(--text-muted);
-  cursor: copy;
-  padding: 0 4px;
-  border-radius: 2px;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+  border: none;
 }
 
 .json-node__toggle:hover .json-node__copy-subtree {
@@ -177,7 +180,6 @@
 
 .json-node__copy-subtree:hover {
   color: var(--text-primary);
-  background: var(--bg-hover);
 }
 
 .json-node__copy-subtree--copied {
