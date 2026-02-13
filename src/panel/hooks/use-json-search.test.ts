@@ -63,12 +63,12 @@ describe("searchJson", () => {
 
   describe("nested objects", () => {
     it("searches nested object values", () => {
-      const data = { user: { profile: { name: "Dino" } } };
-      const result = searchJson(data, "dino");
+      const data = { user: { profile: { name: "Alice" } } };
+      const result = searchJson(data, "alice");
       expect(result).toContainEqual({
         path: "user.profile.name",
         key: "name",
-        value: "Dino",
+        value: "Alice",
       });
     });
 
